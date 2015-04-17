@@ -1,5 +1,34 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{% if userLoggedIn %}
+<div>
+    Logged as: {{ fbUserName }}, id: {{ fbId }}
+</div>
+<div>
+    Messages: total unread: {{ messages.unread }}, unseen: {{ messages.unseen }}
+    <ul>
+        {% for thread in messages.threads %}
+        {% if thread.unseen > 0 %}
+        <li>
+            {{ thread.users }}: unread: {{ thread.unread}}, unseen: {{ thread.unseen }}
+            <ul>
+                {% for message in thread.messages %}
+                <li>{{ message.created_time }}: {{ message.from }}: {{ message.message }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+<div>
+    <!--Facebook <a href="{{ logoutUrl }}">logout</a>-->
+</div>
+{% endif %}
+{% if userLoggedIn == false %}
+<div>
     Facebook <a href="{{ loginUrl }}">login</a>
+</div>
+{% endif %}
 {% endblock %}
