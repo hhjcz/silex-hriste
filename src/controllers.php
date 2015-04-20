@@ -53,10 +53,10 @@ $app->get('/facebook', function () use ($app)
 	));
 });
 
-$app->get('{url}', function () use ($app)
-{
-	return $app->redirect('/angular');
-})->assert('url', '.+');
+//$app->get('{url}', function () use ($app)
+//{
+//	return $app->redirect('/angular');
+//})->assert('url', '.+');
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app)
 {

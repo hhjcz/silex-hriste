@@ -1,2 +1,9 @@
-
+@media screen and (max-width: 480px) {
+    ul {
+        padding-left: 20px;
+    }
+    body {
+        background-color: blue;
+    }
+}
 
