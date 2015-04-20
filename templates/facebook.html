@@ -2,13 +2,13 @@
 
 {% block content %}
 {% if userLoggedIn == true %}
-<div>
+<div class="row">
     <a href="/angular">Angular version</a>
 </div>
-<div>
+<div class="row">
     Logged in as: {{ fbUserName }}, id: {{ fbId }}
 </div>
-<div>
+<div class="row">
     Threads: total unread: {{ messages.unread }}, unseen: {{ messages.unseen }}
     <ul>
         {% for thread in messages.threads %}
@@ -27,12 +27,12 @@
         {% endfor %}
     </ul>
 </div>
-<div>
+<div class="row">
     Facebook <a href="{{ logoutUrl }}">logout</a>
 </div>
 {% endif %}
 {% if userLoggedIn == false %}
-<div>
+<div class="row">
     Facebook <a href="{{ loginUrl }}">login</a>
 </div>
 {% endif %}
