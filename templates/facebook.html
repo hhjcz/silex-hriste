@@ -3,13 +3,17 @@
 {% block content %}
 {% if userLoggedIn == true %}
 <div class="row">
-    <span class="col-xs-4 text-left">
+    {% if showAllMessages %}
+    <span class="col-xs-6 text-left">
         <a href="/facebook?showAllMessages=1">Show all</a>
     </span>
-    <span class="col-xs-4 text-center">
-        <a href="/facebook?showAllMessages=0">Show all</a>
+    {% endif %}
+    {% if showAllMessages %}
+    <span class="col-xs-6 text-left">
+        <a href="/facebook?showAllMessages=0">Show unread</a>
     </span>
-    <span class="col-xs-2 text-right">
+    {% endif %}
+    <span class="col-xs-6 text-right">
         <a class="text-left" href="/angular">Angular</a>
     </span>
 </div>
