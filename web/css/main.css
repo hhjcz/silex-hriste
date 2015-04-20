@@ -5,6 +5,9 @@
     ul ul {
         padding-left: 10px;
     }
+    hr {
+        margin: 5px;
+    }
     body {
         padding: 5px;
     }

@@ -25,6 +25,7 @@
     <ul>
         {% for thread in messages.threads %}
         {% if thread.unread > 0 or showAllMessages %}
+        <hr></hr>
         <li>
             {{ thread.users }}: unread: {{ thread.unread}}, unseen: {{ thread.unseen }}
             <ul>
