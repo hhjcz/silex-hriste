@@ -1,6 +1,5 @@
 <?php
 
-use Facebook\FacebookJavaScriptLoginHelper;
 use Facebook\FacebookRedirectLoginHelper;
 use Facebook\FacebookRequest;
 use Facebook\FacebookRequestException;
@@ -168,7 +167,9 @@ class FacebookApiClient {
 				{
 					$messageInThread['from'] = $messagesInThreadGraph->getProperty('from')->getProperty('name');
 					$messageInThread['created_time'] = $messagesInThreadGraph->getProperty('created_time');
-					$messageInThread['message'] = $messagesInThreadGraph->getProperty('message');
+					$messageText = preg_replace('/https?:\/\/[^\s"<>]+/', '<a href="$0" target="_blank">$0</a>', $messagesInThreadGraph->getProperty('message'));
+					$messageText = preg_replace('/\n/', '<br/>' . PHP_EOL, $messageText);
+					$messageInThread['message'] = $messageText;
 					array_unshift($messagesInThread, $messageInThread);
 				}
 				$thread['messages'] = $messagesInThread;
