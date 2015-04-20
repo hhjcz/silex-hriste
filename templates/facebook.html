@@ -10,7 +10,7 @@
     Messages: total unread: {{ messages.unread }}, unseen: {{ messages.unseen }}
     <ul>
         {% for thread in messages.threads %}
-        {% if thread.unseen > 0 %}
+        {% if thread.unread > 0 %}
         <li>
             {{ thread.users }}: unread: {{ thread.unread}}, unseen: {{ thread.unseen }}
             <ul>
