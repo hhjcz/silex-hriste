@@ -17,7 +17,9 @@
             {{ thread.users }}: unread: {{ thread.unread}}, unseen: {{ thread.unseen }}
             <ul>
                 {% for message in thread.messages %}
-                <li>{{ message.created_time }}: {{ message.from }}: {{ message.message }}</li>
+                <li>
+                    {{ message.created_time }}: {{ message.from }}: <span class="text-info">{{ message.message }}</span>
+                </li>
                 {% endfor %}
             </ul>
         </li>
