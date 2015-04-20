@@ -7,7 +7,7 @@
     Logged in as: {{ fbUserName }}, id: {{ fbId }}
 </div>
 <div>
-    Messages: total unread: {{ messages.unread }}, unseen: {{ messages.unseen }}
+    Threads: total unread: {{ messages.unread }}, unseen: {{ messages.unseen }}
     <ul>
         {% for thread in messages.threads %}
         {% if thread.unread > 0 %}
