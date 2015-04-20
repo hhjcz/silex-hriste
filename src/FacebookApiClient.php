@@ -19,18 +19,14 @@ class FacebookApiClient {
 	/** @var  FacebookSession */
 	private $session;
 
-	public function authenticate()
+	public function authenticate($api_key, $api_secret, $redirect_login_url)
 	{
-		$api_key = '729201217200960';
-		$api_secret = '6df300016ba93013098294136a836be8';
-		$redirect_login_url = 'http://localhost:8888/facebook';
-
 		// initialize your app using your key and secret
 		FacebookSession::setDefaultApplication($api_key, $api_secret);
 
 		// create a helper object which is needed to create a login URL
 		// the $redirect_login_url is the page a visitor will come to after login
-		$this->fbHelper = new FacebookJavaScriptLoginHelper($redirect_login_url);
+		$this->fbHelper = new FacebookRedirectLoginHelper($redirect_login_url);
 
 		// First check if this is an existing PHP session
 		if (isset($_SESSION) && isset($_SESSION['fb_token']))
@@ -46,7 +42,8 @@ class FacebookApiClient {
 				// catch any exceptions and set the sesson null
 				$this->session = null;
 				echo 'No session: ' . $e->getMessage();
-				throw $e;
+				unset($_SESSION['fb_token']);
+				//throw $e;
 			}
 		} elseif (empty($this->session))
 		{
@@ -54,7 +51,7 @@ class FacebookApiClient {
 			try
 			{
 				// the visitor is redirected from the login, let's pickup the session
-				$this->session = $this->fbHelper->getSession();
+				$this->session = $this->fbHelper->getSessionFromRedirect();
 			} catch (FacebookRequestException $e)
 			{
 				// Facebook has returned an error
@@ -78,7 +75,7 @@ class FacebookApiClient {
 		} else
 		{
 			// we need to create a new session, provide a login link
-			echo 'No session, please <a href="' . $this->fbHelper->getLoginUrl(array('publish_actions')) . '">login</a>.';
+			//echo 'No session, please <a href="' . $this->fbHelper->getLoginUrl(array('publish_actions')) . '">login</a>.';
 		}
 
 		return $this->session;

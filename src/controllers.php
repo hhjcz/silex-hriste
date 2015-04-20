@@ -13,13 +13,29 @@ $app->get('/', function () use ($app)
 
 $app->get('/facebook', function () use ($app)
 {
+	$fbUsername = '';
+	$fbId = '';
+	$messages = ['unread' => 0, 'unseen' => 0, 'threads' => []];
 	session_start();
 	$fbClient = new FacebookApiClient();
-	$fbSession = $fbClient->authenticate();
-	$loginUrl = '';
-	$logoutUrl = '';
-	//$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
-	//$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, 'http://localhost:8888/facebook');
+	$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
+	if ($fbSession)
+	{
+		$loginUrl = '';
+		$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, 'http://localhost:8888/facebook');
+	} else
+	{
+		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
+		$logoutUrl = '';
+		return $app['twig']->render('facebook.html', array(
+			'userLoggedIn' => false,
+			'loginUrl'     => $loginUrl,
+			'logoutUrl'    => $logoutUrl,
+			'fbUserName'   => $fbUsername,
+			'fbId'         => $fbId,
+			'messages'     => $messages
+		));
+	}
 
 	$me = $fbClient->getUserInfo();
 	$fbUsername = $me->getName();
@@ -31,10 +47,13 @@ $app->get('/facebook', function () use ($app)
 		'loginUrl'     => $loginUrl,
 		'logoutUrl'    => $logoutUrl,
 		'fbUserName'   => $fbUsername,
-		'userLoggedIn' => true,
 		'fbId'         => $fbId,
 		'messages'     => $messages
 	));
+});
+
+$app->get('/angular', function () use ($app) {
+	return $app['twig']->render('angular-hriste/index.html');
 });
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app)

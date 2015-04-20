@@ -1,9 +1,10 @@
 {% extends "layout.html" %}
 
 {% block content %}
-{% if userLoggedIn %}
+{% if userLoggedIn == true %}
 <div>
-    Logged as: {{ fbUserName }}, id: {{ fbId }}
+    {{ userLoggedIn }}
+    Logged in as: {{ fbUserName }}, id: {{ fbId }}
 </div>
 <div>
     Messages: total unread: {{ messages.unread }}, unseen: {{ messages.unseen }}
@@ -23,7 +24,7 @@
     </ul>
 </div>
 <div>
-    <!--Facebook <a href="{{ logoutUrl }}">logout</a>-->
+    Facebook <a href="{{ logoutUrl }}">logout</a>
 </div>
 {% endif %}
 {% if userLoggedIn == false %}

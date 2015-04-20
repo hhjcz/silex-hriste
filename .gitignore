@@ -1,3 +1,4 @@
 /vendor/
 /var/
+env.php
 .idea
