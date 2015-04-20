@@ -3,7 +3,7 @@
 {% block content %}
 {% if userLoggedIn == true %}
 <div class="row">
-    {% if showAllMessages %}
+    {% if not showAllMessages %}
     <span class="col-xs-6 text-left">
         <a href="/facebook?showAllMessages=1">Show all</a>
     </span>
