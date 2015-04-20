@@ -12,7 +12,7 @@ $app->get('/', function () use ($app)
 })
 	->bind('homepage');
 
-$app->get('/facebook', function () use ($app)
+$app->get('/facebook', function (Request $request) use ($app)
 {
 	$fbUsername = '';
 	$fbId = '';
@@ -29,12 +29,13 @@ $app->get('/facebook', function () use ($app)
 		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
 		$logoutUrl = '';
 		return $app['twig']->render('facebook.html', array(
-			'userLoggedIn' => false,
-			'loginUrl'     => $loginUrl,
-			'logoutUrl'    => $logoutUrl,
-			'fbUserName'   => $fbUsername,
-			'fbId'         => $fbId,
-			'messages'     => $messages
+			'userLoggedIn'    => false,
+			'loginUrl'        => $loginUrl,
+			'logoutUrl'       => $logoutUrl,
+			'fbUserName'      => $fbUsername,
+			'fbId'            => $fbId,
+			'showAllMessages' => $request->query->get('showAllMessages') == 'true' ? true : false,
+			'messages'        => $messages
 		));
 	}
 
@@ -44,12 +45,13 @@ $app->get('/facebook', function () use ($app)
 	$messages = $fbClient->getMessages();
 
 	return $app['twig']->render('facebook.html', array(
-		'userLoggedIn' => true,
-		'loginUrl'     => $loginUrl,
-		'logoutUrl'    => $logoutUrl,
-		'fbUserName'   => $fbUsername,
-		'fbId'         => $fbId,
-		'messages'     => $messages
+		'userLoggedIn'    => true,
+		'loginUrl'        => $loginUrl,
+		'logoutUrl'       => $logoutUrl,
+		'fbUserName'      => $fbUsername,
+		'fbId'            => $fbId,
+		'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
+		'messages'        => $messages
 	));
 });
 

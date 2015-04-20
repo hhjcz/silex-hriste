@@ -139,50 +139,99 @@ class FacebookApiClient {
 		{
 			$request = new FacebookRequest($this->session, 'GET', '/me/inbox', ['limit' => 5]);
 			$response = $request->execute();
-			$messagesGraph = $response->getGraphObject();
+			$inboxGraph = $response->getGraphObject();
 			//dump($messagesGraph);
-			$messages = new stdClass();
-			$messages->summary = $messagesGraph->getProperty('summary');
-			$messages->unseen = $messages->summary->getProperty('unseen_count');
-			$messages->unread = $messages->summary->getProperty('unread_count');
-			foreach ($messagesGraph->getPropertyAsArray('data') as $threadGraph)
-			{
-				$thread['unseen'] = $threadGraph->getProperty('unseen');
-				$thread['unread'] = $threadGraph->getProperty('unread');
-
-				$threadUsers = '';
-				$usersGraph = $threadGraph->getProperty('to');
-				foreach ($usersGraph as $userGraph)
-				{
-					$threadUsers .= $userGraph->getProperty('name') . ', ';
-				}
-				$thread['users'] = '';
-				$thread['users'] .= '' . $usersGraph->getProperty('0')->getProperty('name');
-				$thread['users'] .= ', ' . $usersGraph->getProperty('1')->getProperty('name');
-				$thread['users'] .= $usersGraph->getProperty('2') ? ', ' . $usersGraph->getProperty('2')->getProperty('name') : '';
-
-				$messagesInThreadGraph = $threadGraph->getProperty('comments')->getPropertyAsArray('data');
-				$messagesInThread = [];
-				foreach ($messagesInThreadGraph as $messagesInThreadGraph)
-				{
-					$messageInThread['from'] = $messagesInThreadGraph->getProperty('from')->getProperty('name');
-					$messageInThread['created_time'] = $messagesInThreadGraph->getProperty('created_time');
-					$messageText = $messagesInThreadGraph->getProperty('message');
-					$messageText = htmlspecialchars($messageText);
-					$messageText = preg_replace('/https?:\/\/[^\s"<>]+/', '<a href="$0" target="_blank">$0</a>', $messageText);
-					$messageText = preg_replace('/\n/', '<br/>' . PHP_EOL, $messageText);
-					$messageInThread['message'] = $messageText;
-					array_unshift($messagesInThread, $messageInThread);
-				}
-				$thread['messages'] = $messagesInThread;
-				$messages->threads[] = $thread;
-			}
+			$inbox = new stdClass();
+			$inbox->summary = $inboxGraph->getProperty('summary');
+			$inbox->unseen = $inbox->summary->getProperty('unseen_count');
+			$inbox->unread = $inbox->summary->getProperty('unread_count');
+			$inbox->threads = $this->extractThreadsFromInboxGraph($inboxGraph);
 		} catch (FacebookRequestException $e)
 		{
 			throw $e;
 		}
 
-		//dump($messages);
-		return $messages;
+		//dump($inbox);
+		return $inbox;
+	}
+
+	/**
+	 * @param $inboxGraph
+	 * @return array
+	 */
+	private function extractThreadsFromInboxGraph($inboxGraph)
+	{
+		$threads = [];
+		foreach ($inboxGraph->getPropertyAsArray('data') as $threadGraph)
+		{
+			$thread['unseen'] = $threadGraph->getProperty('unseen');
+			$thread['unread'] = $threadGraph->getProperty('unread');
+
+			$thread['users'] = $this->extractUsersFromThreadGraph($threadGraph, $thread);
+
+			$thread['messages'] = $this->extractMessagesFromThreadGraph($threadGraph);
+			$threads[] = $thread;
+		}
+
+		return $threads;
+	}
+
+	/**
+	 * @param $threadGraph
+	 * @return mixed
+	 */
+	private function extractUsersFromThreadGraph($threadGraph)
+	{
+		$threadUsers = '';
+		$usersGraph = $threadGraph->getProperty('to');
+		//foreach ($usersGraph as $userGraph)
+		//{
+		//	$threadUsers .= $userGraph->getProperty('name') . ', ';
+		//}
+		$threadUsers .= '' . $usersGraph->getProperty('0')->getProperty('name');
+		$threadUsers .= ', ' . $usersGraph->getProperty('1')->getProperty('name');
+		$threadUsers .= $usersGraph->getProperty('2') ? ', ' . $usersGraph->getProperty('2')->getProperty('name') : '';
+		$threadUsers .= $usersGraph->getProperty('3') ? ', ' . $usersGraph->getProperty('3')->getProperty('name') : '';
+		$threadUsers .= $usersGraph->getProperty('4') ? ', ' . $usersGraph->getProperty('4')->getProperty('name') : '';
+
+		return $threadUsers;
+	}
+
+	/**
+	 * @param $threadGraph
+	 * @return array
+	 */
+	private function extractMessagesFromThreadGraph($threadGraph)
+	{
+		$messagesInThreadGraph = $threadGraph->getProperty('comments')->getPropertyAsArray('data');
+		$messagesInThread = [];
+		$i = 0;
+		foreach ($messagesInThreadGraph as $messageInThreadGraph)
+		{
+			$messageInThread['from'] = $messageInThreadGraph->getProperty('from')->getProperty('name');
+			$messageInThread['created_time'] = $messageInThreadGraph->getProperty('created_time');
+			$messageText = $messageInThreadGraph->getProperty('message');
+			$messageInThread['message'] = $this->htmlEncodeMessageString($messageText);
+			if ($i++ < sizeof($messagesInThreadGraph) - $threadGraph->getProperty('unread'))
+				$messageInThread['unread'] = false;
+			else
+				$messageInThread['unread'] = true;
+			array_unshift($messagesInThread, $messageInThread);
+		}
+
+		return $messagesInThread;
+	}
+
+	/**
+	 * @param $messageText
+	 * @return mixed|string
+	 */
+	private function htmlEncodeMessageString($messageText)
+	{
+		$messageText = htmlspecialchars($messageText);
+		$messageText = preg_replace('/https?:\/\/[^\s"<>]+/', '<a href="$0" target="_blank">$0</a>', $messageText);
+		$messageText = preg_replace('/\n/', '<br/>' . PHP_EOL, $messageText);
+
+		return $messageText;
 	}
 }

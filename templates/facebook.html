@@ -12,14 +12,16 @@
     Threads: total unread: {{ messages.unread }}, unseen: {{ messages.unseen }}
     <ul>
         {% for thread in messages.threads %}
-        {% if thread.unread > 0 %}
+        {% if thread.unread > 0 or showAllMessages %}
         <li>
             {{ thread.users }}: unread: {{ thread.unread}}, unseen: {{ thread.unseen }}
             <ul>
                 {% for message in thread.messages %}
+                {% if (message['unread'] or showAllMessages) %}
                 <li>
                     {{ message.created_time }}: {{ message.from }}: <div class="text-success">{{ message.message | raw }}</div>
                 </li>
+                {% endif %}
                 {% endfor %}
             </ul>
         </li>
