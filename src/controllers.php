@@ -5,7 +5,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 //Request::setTrustedProxies(array('127.0.0.1'));
 
-$app->get('/', function () use ($app)
+$app->get('/silex', function () use ($app)
 {
 	return $app['twig']->render('index.html', array());
 })
@@ -52,10 +52,10 @@ $app->get('/facebook', function () use ($app)
 	));
 });
 
-$app->get('*', function () use ($app)
+$app->get('{url}', function () use ($app)
 {
 	return $app->redirect('/angular');
-});
+})->assert('url', '.+');
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app)
 {
