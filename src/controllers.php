@@ -52,9 +52,9 @@ $app->get('/facebook', function () use ($app)
 	));
 });
 
-$app->get('/angular', function () use ($app)
+$app->get('*', function () use ($app)
 {
-	return $app['twig']->render('angular-hriste/index.html');
+	return $app->redirect('/angular');
 });
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app)
