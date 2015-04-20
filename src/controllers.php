@@ -7,7 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 $app->get('/', function () use ($app)
 {
-	return $app['twig']->render('index.html', array());
+	return $app->redirect('/facebook');
+	//return $app['twig']->render('index.html', array());
 })
 	->bind('homepage');
 
