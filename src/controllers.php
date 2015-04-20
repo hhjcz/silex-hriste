@@ -22,7 +22,7 @@ $app->get('/facebook', function () use ($app)
 	if ($fbSession)
 	{
 		$loginUrl = '';
-		$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, 'http://localhost:8888/facebook');
+		$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, $app['fb_redirect_login_url'] . '?logout');
 	} else
 	{
 		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
@@ -52,7 +52,8 @@ $app->get('/facebook', function () use ($app)
 	));
 });
 
-$app->get('/angular', function () use ($app) {
+$app->get('/angular', function () use ($app)
+{
 	return $app['twig']->render('angular-hriste/index.html');
 });
 
