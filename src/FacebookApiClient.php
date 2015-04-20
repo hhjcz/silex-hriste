@@ -81,6 +81,9 @@ class FacebookApiClient {
 		return $this->session;
 	}
 
+	/**
+	 * @return FacebookRedirectLoginHelper
+	 */
 	public function fbHelper()
 	{
 		return $this->fbHelper;
