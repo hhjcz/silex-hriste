@@ -1,5 +1,8 @@
 @media screen and (max-width: 480px) {
     ul {
+        padding-left: 15px;
+    }
+    ul ul {
         padding-left: 10px;
     }
     body {
