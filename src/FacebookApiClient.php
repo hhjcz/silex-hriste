@@ -167,7 +167,9 @@ class FacebookApiClient {
 				{
 					$messageInThread['from'] = $messagesInThreadGraph->getProperty('from')->getProperty('name');
 					$messageInThread['created_time'] = $messagesInThreadGraph->getProperty('created_time');
-					$messageText = preg_replace('/https?:\/\/[^\s"<>]+/', '<a href="$0" target="_blank">$0</a>', $messagesInThreadGraph->getProperty('message'));
+					$messageText = $messagesInThreadGraph->getProperty('message');
+					$messageText = htmlspecialchars($messageText);
+					$messageText = preg_replace('/https?:\/\/[^\s"<>]+/', '<a href="$0" target="_blank">$0</a>', $messageText);
 					$messageText = preg_replace('/\n/', '<br/>' . PHP_EOL, $messageText);
 					$messageInThread['message'] = $messageText;
 					array_unshift($messagesInThread, $messageInThread);
