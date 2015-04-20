@@ -3,7 +3,12 @@
 {% block content %}
 {% if userLoggedIn == true %}
 <div class="row">
-    <a href="/angular">Angular version</a>
+    <span class="col-xs-6 text-left">
+        <a href="/facebook?showAllMessages=true">Show all</a>
+    </span>
+    <span class="col-xs-6 text-right">
+        <a class="text-left" href="/angular">Angular</a>
+    </span>
 </div>
 <div class="row">
     Logged in as: {{ fbUserName }}, id: {{ fbId }}
@@ -19,7 +24,8 @@
                 {% for message in thread.messages %}
                 {% if (message['unread'] or showAllMessages) %}
                 <li>
-                    {{ message.created_time }}: {{ message.from }}: <div class="text-success">{{ message.message | raw }}</div>
+                    {{ message.created_time }}: {{ message.from }}:
+                    <div class="text-success">{{ message.message | raw }}</div>
                 </li>
                 {% endif %}
                 {% endfor %}
