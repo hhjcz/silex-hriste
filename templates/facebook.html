@@ -3,10 +3,13 @@
 {% block content %}
 {% if userLoggedIn == true %}
 <div class="row">
-    <span class="col-xs-6 text-left">
-        <a href="/facebook?showAllMessages=true">Show all</a>
+    <span class="col-xs-4 text-left">
+        <a href="/facebook?showAllMessages=1">Show all</a>
     </span>
-    <span class="col-xs-6 text-right">
+    <span class="col-xs-4 text-center">
+        <a href="/facebook?showAllMessages=0">Show all</a>
+    </span>
+    <span class="col-xs-2 text-right">
         <a class="text-left" href="/angular">Angular</a>
     </span>
 </div>
