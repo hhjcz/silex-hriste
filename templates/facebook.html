@@ -3,7 +3,7 @@
 {% block title %}silex-hriste{% endblock %}
 
 {% block content %}
-<nav class="top-bar" data-topbar>
+<!--<nav class="top-bar" data-topbar>
     <ul class="title-area">
 
         <li class="name">
@@ -103,111 +103,81 @@
             </li>
         </ul>
     </section>
-</nav>
-
-<!--<nav class="top-bar" data-topbar role="navigation">
-    <ul class="title-area">
-        <li class="name">
-            <h1><a href="#">My Site</a></h1>
-        </li>
-        &lt;!&ndash; Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone &ndash;&gt;
-        <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
-    </ul>
-
-    <section class="top-bar-section">
-        &lt;!&ndash; Right Nav Section &ndash;&gt;
-        <ul class="right">
-            <li class="active"><a href="#">Right Button Active</a></li>
-            <li class="has-dropdown">
-                <a href="#">Right Button Dropdown</a>
-                <ul class="dropdown">
-                    <li><a href="#">First link in dropdown</a></li>
-                    <li class="active"><a href="#">Active link in dropdown</a></li>
-                </ul>
-            </li>
-        </ul>
-
-        &lt;!&ndash; Left Nav Section &ndash;&gt;
-        <ul class="left">
-            <li><a href="#">Left Nav Button</a></li>
-        </ul>
-    </section>
-</nav>
+</nav>-->
 
 <nav class="top-bar" data-topbar role="navigation">
     <ul class="title-area">
         <li class="name">
-            <h1><a href="#">My Site</a></h1>
+            <h1><a href="#">HHjovo hriste</a></h1>
         </li>
-        &lt;!&ndash; Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone &ndash;&gt;
+        <!--Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone-->
         <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
     </ul>
 
     <section class="top-bar-section">
-        <ul class="left">
-            {% if userLoggedIn == true %}
-            {% if not showAllMessages %}
-            <li class="left">
-                <a href="/facebook?showAllMessages=1">Show all</a>
-            </li>
-            {% endif %}
-            {% if showAllMessages %}
-            <li class="left">
-                <a href="/facebook?showAllMessages=0">Show unread</a>
-            </li>
-            {% endif %}
-        </ul>
         <ul class="right">
-            <li class="right">
+            <li class="">
                 <a class="text-left" href="/angular/">Angular</a>
             </li>
         </ul>
     </section>
-</nav>-->
+</nav>
 
 <div class="row">
     <div class="small-12 columns">
-        Threads: total unread: {{ messages.unread }}, unseen: {{ messages.unseen }}
-        <ul class="no-bullet">
-            {% for thread in messages.threads %}
-            {% if thread.unread > 0 or showAllMessages %}
-            <hr>
-            <li>
-                <span class="label primary">{{ thread.users }}: </span>
-                <span class="small-text"> unread: {{ thread.unread }}, unseen: {{ thread.unseen }}</span>
-                <ul class="no-bullet">
-                    {% for message in thread.messages %}
-                    {% if (message['unread'] or showAllMessages) %}
-                    <li>
-                        <span class="label success">{{ message.from }}:</span>
-                        <span class="small-text">{{ message.created_time }}:</span>
+        {% if userLoggedIn == true %}
+        {% if not showAllMessages %}
+        <a href="/facebook?showAllMessages=1" class="label tiny success">Show all</a>
+        {% endif %}
+        {% if showAllMessages %}
+        <a href="/facebook?showAllMessages=0" class="label tiny success">Show unread</a>
+        {% endif %}
+        <span class="small-text"> thread: {{ messages.unread }} unread, {{ messages.unseen }} unseen </span>
+    </div>
 
-                        <div class="message-text">{{ message.message | raw }}</div>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                </ul>
-            </li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
-</div>
+    <div class="row">
+        <div class="small-12 columns small-text">
+            <ul class="no-bullet">
+                {% for thread in messages.threads %}
+                {% if thread.unread > 0 or showAllMessages %}
+                <hr>
+                <li>
+                    <span class="label info">{{ thread.users }}: </span>
+                    <span class="small-text"> unread: {{ thread.unread }}, unseen: {{ thread.unseen }}</span>
+                    <ul class="no-bullet">
+                        {% for message in thread.messages %}
+                        {% if (message['unread'] or showAllMessages) %}
+                        <li>
+                            <span class="label secondary">{{ message.from }}:</span>
+                            <span class="small-text">{{ message.created_time }}:</span>
 
-<div class="row">
-    <div class="small-12 columns">
-        Logged in as: {{ fbUserName }}, id: {{ fbId }}
+                            <div class="message-text">{{ message.message | raw }}</div>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="small-12 columns">
-        Facebook <a href="{{ logoutUrl }}">logout</a>
+
+
+    <div class="row">
+        <div class="small-12 columns">
+            Logged in as: {{ fbUserName }}, id: {{ fbId }}
+        </div>
     </div>
-</div>
-{% endif %}
-{% if userLoggedIn == false %}
-<div class="row">
-    Facebook <a href="{{ loginUrl }}">login</a>
-</div>
-{% endif %}
-{% endblock %}
+    <div class="row">
+        <div class="small-12 columns">
+            Facebook <a href="{{ logoutUrl }}">logout</a>
+        </div>
+    </div>
+    {% endif %}
+    {% if userLoggedIn == false %}
+    <div class="row">
+        Facebook <a href="{{ loginUrl }}">login</a>
+    </div>
+    {% endif %}
+    {% endblock %}
