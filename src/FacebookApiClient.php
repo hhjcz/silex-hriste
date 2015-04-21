@@ -209,7 +209,7 @@ class FacebookApiClient {
 		foreach ($messagesInThreadGraph as $messageInThreadGraph)
 		{
 			$messageInThread['from'] = $messageInThreadGraph->getProperty('from')->getProperty('name');
-			$messageInThread['created_time'] = $messageInThreadGraph->getProperty('created_time');
+			$messageInThread['created_time'] = $this->prettifyTimestamp('' . $messageInThreadGraph->getProperty('created_time'));
 			$messageText = $messageInThreadGraph->getProperty('message');
 			$messageInThread['message'] = $this->htmlEncodeMessageString($messageText);
 			if ($i++ < sizeof($messagesInThreadGraph) - $threadGraph->getProperty('unread'))
@@ -233,5 +233,18 @@ class FacebookApiClient {
 		$messageText = preg_replace('/\n/', '<br/>' . PHP_EOL, $messageText);
 
 		return $messageText;
+	}
+
+	/**
+	 * @param $timestamp
+	 * @return string
+	 */
+	public  function prettifyTimestamp($timestamp)
+	{
+		$carbon = Carbon\Carbon::createFromFormat('Y-m-d\TG:i:s\+0000', $timestamp, 'UTC');
+		$carbon->setTimezone('Europe/Prague');
+		setlocale(LC_TIME, 'cs_CZ');
+
+		return $carbon->formatLocalized('%a %d %b %H:%M');
 	}
 }
