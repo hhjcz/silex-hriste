@@ -3,22 +3,168 @@
 {% block title %}silex-hriste{% endblock %}
 
 {% block content %}
-{% if userLoggedIn == true %}
-<div class="row">
-    {% if not showAllMessages %}
-    <span class="small-6 columns text-left">
-        <a href="/facebook?showAllMessages=1">Show all</a>
-    </span>
-    {% endif %}
-    {% if showAllMessages %}
-    <span class="small-6 columns text-left">
-        <a href="/facebook?showAllMessages=0">Show unread</a>
-    </span>
-    {% endif %}
-    <span class="small-6 columns text-right">
-        <a class="text-left" href="/angular/">Angular</a>
-    </span>
-</div>
+<nav class="top-bar" data-topbar>
+    <ul class="title-area">
+
+        <li class="name">
+            <h1>
+                <a href="#">
+                    Top Bar Title
+                </a>
+            </h1>
+        </li>
+        <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+
+        <ul class="left">
+            <li class="divider"></li>
+            <li class="has-dropdown">
+                <a class="active" href="#">Main Item 1</a>
+                <ul class="dropdown">
+                    <li><label>Section Name</label></li>
+                    <li><a href="#" class="">Dropdown Level 1</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li class="divider"></li>
+                    <li><label>Section Name</label></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">See all →</a></li>
+                </ul>
+            </li>
+            <li class="divider"></li>
+            <li><a href="#">Main Item 2</a></li>
+            <li class="divider"></li>
+            <li class="has-dropdown">
+                <a href="#">Main Item 3</a>
+                <ul class="dropdown">
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">See all →</a></li>
+                </ul>
+            </li>
+
+        </ul>
+
+
+        <ul class="right">
+            <li class="divider"></li>
+            <li class="has-dropdown">
+                <a href="#">Main Item 4</a>
+                <ul class="dropdown">
+                    <li><label>Section Name</label></li>
+                    <li class="has-dropdown">
+                        <a href="#" class="">Has Dropdown, Level 1</a>
+                        <ul class="dropdown">
+                            <li><a href="#">Dropdown Options</a></li>
+                            <li><a href="#">Dropdown Options</a></li>
+                            <li class="has-dropdown">
+                                <a href="#">Has Dropdown, Level 2</a>
+                                <ul class="dropdown test">
+                                    <li><a href="#">Subdropdown Option</a></li>
+                                    <li><a href="#">Subdropdown Option</a></li>
+                                    <li><a href="#">Subdropdown Option</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#">Subdropdown Option</a></li>
+                            <li><a href="#">Subdropdown Option</a></li>
+                            <li><a href="#">Subdropdown Option</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li class="divider"></li>
+                    <li><label>Section Name</label></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">See all →</a></li>
+                </ul>
+            </li>
+            <li class="divider"></li>
+            <li><a href="#">Main Item 5</a></li>
+            <li class="divider"></li>
+            <li class="has-dropdown">
+                <a href="#">Main Item 6</a>
+                <ul class="dropdown">
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li><a href="#">Dropdown Option</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">See all →</a></li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+</nav>
+
+<!--<nav class="top-bar" data-topbar role="navigation">
+    <ul class="title-area">
+        <li class="name">
+            <h1><a href="#">My Site</a></h1>
+        </li>
+        &lt;!&ndash; Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone &ndash;&gt;
+        <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+        &lt;!&ndash; Right Nav Section &ndash;&gt;
+        <ul class="right">
+            <li class="active"><a href="#">Right Button Active</a></li>
+            <li class="has-dropdown">
+                <a href="#">Right Button Dropdown</a>
+                <ul class="dropdown">
+                    <li><a href="#">First link in dropdown</a></li>
+                    <li class="active"><a href="#">Active link in dropdown</a></li>
+                </ul>
+            </li>
+        </ul>
+
+        &lt;!&ndash; Left Nav Section &ndash;&gt;
+        <ul class="left">
+            <li><a href="#">Left Nav Button</a></li>
+        </ul>
+    </section>
+</nav>
+
+<nav class="top-bar" data-topbar role="navigation">
+    <ul class="title-area">
+        <li class="name">
+            <h1><a href="#">My Site</a></h1>
+        </li>
+        &lt;!&ndash; Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone &ndash;&gt;
+        <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+        <ul class="left">
+            {% if userLoggedIn == true %}
+            {% if not showAllMessages %}
+            <li class="left">
+                <a href="/facebook?showAllMessages=1">Show all</a>
+            </li>
+            {% endif %}
+            {% if showAllMessages %}
+            <li class="left">
+                <a href="/facebook?showAllMessages=0">Show unread</a>
+            </li>
+            {% endif %}
+        </ul>
+        <ul class="right">
+            <li class="right">
+                <a class="text-left" href="/angular/">Angular</a>
+            </li>
+        </ul>
+    </section>
+</nav>-->
+
 <div class="row">
     <div class="small-12 columns">
         Threads: total unread: {{ messages.unread }}, unseen: {{ messages.unseen }}
@@ -27,7 +173,7 @@
             {% if thread.unread > 0 or showAllMessages %}
             <hr>
             <li>
-                <span class="label round primary">{{ thread.users }}: </span>
+                <span class="label primary">{{ thread.users }}: </span>
                 <span class="small-text"> unread: {{ thread.unread }}, unseen: {{ thread.unseen }}</span>
                 <ul class="no-bullet">
                     {% for message in thread.messages %}
@@ -47,6 +193,7 @@
         </ul>
     </div>
 </div>
+
 <div class="row">
     <div class="small-12 columns">
         Logged in as: {{ fbUserName }}, id: {{ fbId }}
