@@ -216,7 +216,7 @@ class FacebookApiClient {
 				$messageInThread['unread'] = false;
 			else
 				$messageInThread['unread'] = true;
-			array_unshift($messagesInThread, $messageInThread);
+			array_push($messagesInThread, $messageInThread);
 		}
 
 		return $messagesInThread;

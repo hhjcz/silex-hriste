@@ -1,9 +1,10 @@
 @media screen and (max-width: 480px) {
     ul {
-        padding-left: 15px;
-    }
-    ul ul {
         padding-left: 10px;
+    }
+    ul li ul {
+        padding-left: 10px;
+        margin-left: 0px;
     }
     hr {
         margin-top: 5px;
@@ -18,3 +19,14 @@
     /*}*/
 }
 
+div.message-text {
+    border: 1px solid #d8d8d8;
+    margin-bottom: 0.25rem;
+    padding: 0.25rem;
+    background: #f2f2f2;
+    color: #333333;
+}
+
+.small-text {
+    font-size: 0.6875rem;
+}
