@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e974dc50ba1ef025b2451a8c42f14aaf",
+    "hash": "d8ca440f9a3a470536c7526f300133d6",
     "packages": [
         {
             "name": "facebook/php-sdk-v4",
@@ -127,6 +127,53 @@
                 "psr-3"
             ],
             "time": "2015-03-09 09:58:04"
+        },
+        {
+            "name": "nesbot/carbon",
+            "version": "1.18.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/briannesbitt/Carbon.git",
+                "reference": "99e2f69f7bdc2cc4334b2d00f1e0ba450623ea36"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/99e2f69f7bdc2cc4334b2d00f1e0ba450623ea36",
+                "reference": "99e2f69f7bdc2cc4334b2d00f1e0ba450623ea36",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "symfony/translation": "2.6.*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Carbon": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brian Nesbitt",
+                    "email": "brian@nesbot.com",
+                    "homepage": "http://nesbot.com"
+                }
+            ],
+            "description": "A simple API extension for DateTime.",
+            "homepage": "http://carbon.nesbot.com",
+            "keywords": [
+                "date",
+                "datetime",
+                "time"
+            ],
+            "time": "2015-03-26 03:05:57"
         },
         {
             "name": "pimple/pimple",
@@ -306,12 +353,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/silexphp/Silex-WebProfiler.git",
-                "reference": "b2ab27602bbaa08c7c8072d091d82bd8e561e3d8"
+                "reference": "103209be88501fc795ae451ed32d9f5944b7dece"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silexphp/Silex-WebProfiler/zipball/b2ab27602bbaa08c7c8072d091d82bd8e561e3d8",
-                "reference": "b2ab27602bbaa08c7c8072d091d82bd8e561e3d8",
+                "url": "https://api.github.com/repos/silexphp/Silex-WebProfiler/zipball/103209be88501fc795ae451ed32d9f5944b7dece",
+                "reference": "103209be88501fc795ae451ed32d9f5944b7dece",
                 "shasum": ""
             },
             "require": {
@@ -342,7 +389,7 @@
             ],
             "description": "A WebProfiler for Silex",
             "homepage": "http://silex.sensiolabs.org/",
-            "time": "2014-12-16 04:16:07"
+            "time": "2015-04-19 10:18:35"
         },
         {
             "name": "symfony/browser-kit",
@@ -1910,20 +1957,20 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.18.0",
+            "version": "v1.18.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "4cf7464348e7f9893a93f7096a90b73722be99cf"
+                "reference": "9f70492f44398e276d1b81c1b43adfe6751c7b7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/4cf7464348e7f9893a93f7096a90b73722be99cf",
-                "reference": "4cf7464348e7f9893a93f7096a90b73722be99cf",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/9f70492f44398e276d1b81c1b43adfe6751c7b7f",
+                "reference": "9f70492f44398e276d1b81c1b43adfe6751c7b7f",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.4"
+                "php": ">=5.2.7"
             },
             "type": "library",
             "extra": {
@@ -1963,7 +2010,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-01-25 17:32:08"
+            "time": "2015-04-19 08:30:27"
         }
     ],
     "packages-dev": [],

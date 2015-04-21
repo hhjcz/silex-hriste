@@ -22,7 +22,8 @@
         "symfony/twig-bridge": "~2.6",
         "symfony/validator": "~2.6",
         "facebook/php-sdk-v4": "~4.0",
-        "symfony/var-dumper": "~2.6"
+        "symfony/var-dumper": "~2.6",
+        "nesbot/carbon": "~1.18"
     },
     "autoload": {
         "psr-0": { "": "src/" }
