@@ -6,12 +6,12 @@
 
     {% if userLoggedIn == true %}
         <div class="row">
-            <div class="small-6 columns">
+            <div class="small-12 columns">
                 {% if not showAllMessages %}
-                    <a href="/facebook?showAllMessages=1" class="label small success">Show all</a>
+                    <a href="/facebook?showAllMessages=1" class="button tiny success">Show all</a>
                 {% endif %}
                 {% if showAllMessages %}
-                    <a href="/facebook?showAllMessages=0" class="label small success">Show unread</a>
+                    <a href="/facebook?showAllMessages=0" class="button tiny success">Show unread</a>
                 {% endif %}
                 <span class="small-text"> thread: {{ messages.unread }} unread, {{ messages.unseen }} unseen </span>
             </div>
