@@ -133,11 +133,11 @@ class FacebookApiClient {
 	 * @return GraphObject
 	 * @throws FacebookRequestException
 	 */
-	public function getMessages()
+	public function getMessages($limit = 5)
 	{
 		try
 		{
-			$request = new FacebookRequest($this->session, 'GET', '/me/inbox', ['limit' => 5]);
+			$request = new FacebookRequest($this->session, 'GET', '/me/inbox', ['limit' => $limit]);
 			$response = $request->execute();
 			$inboxGraph = $response->getGraphObject();
 			//dump($messagesGraph);
@@ -188,8 +188,8 @@ class FacebookApiClient {
 		//{
 		//	$threadUsers .= $userGraph->getProperty('name') . ', ';
 		//}
-		$threadUsers .= '' . $usersGraph->getProperty('0')->getProperty('name');
-		$threadUsers .= ', ' . $usersGraph->getProperty('1')->getProperty('name');
+		$threadUsers .= $usersGraph->getProperty('0') ? ', ' . $usersGraph->getProperty('0')->getProperty('name') : '';
+		$threadUsers .= $usersGraph->getProperty('1') ? ', ' . $usersGraph->getProperty('1')->getProperty('name') : '';
 		$threadUsers .= $usersGraph->getProperty('2') ? ', ' . $usersGraph->getProperty('2')->getProperty('name') : '';
 		$threadUsers .= $usersGraph->getProperty('3') ? ', ' . $usersGraph->getProperty('3')->getProperty('name') : '';
 		$threadUsers .= $usersGraph->getProperty('4') ? ', ' . $usersGraph->getProperty('4')->getProperty('name') : '';
@@ -203,7 +203,9 @@ class FacebookApiClient {
 	 */
 	private function extractMessagesFromThreadGraph($threadGraph)
 	{
-		$messagesInThreadGraph = $threadGraph->getProperty('comments')->getPropertyAsArray('data');
+		$messagesInThreadGraph = $threadGraph->getProperty('comments');
+		if ($messagesInThreadGraph instanceof GraphObject) $messagesInThreadGraph = $messagesInThreadGraph->getPropertyAsArray('data');
+		else return [];
 		$messagesInThread = [];
 		$i = 0;
 		foreach ($messagesInThreadGraph as $messageInThreadGraph)

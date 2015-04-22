@@ -43,7 +43,7 @@ $app->get('/facebook', function (Request $request) use ($app)
 	$me = $fbClient->getUserInfo();
 	$fbUsername = $me->getName();
 	$fbId = $me->getId();
-	$messages = $fbClient->getMessages();
+	$messages = $fbClient->getMessages($limit = 5);
 
 	return $app['twig']->render('facebook.twig', array(
 		'userLoggedIn'    => true,
