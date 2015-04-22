@@ -1,4 +1,6 @@
 /vendor/
 /var/
 env.php
+web/bower_components
+web/node_modules
 .idea

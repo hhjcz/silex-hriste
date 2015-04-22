@@ -1,0 +1,14 @@
+{
+  "name": "hhjovo-hriste",
+  "version": "0.0.1",
+  "description": "hhjovo hriste",
+  "main": "index.js",
+  "dependencies": {
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "hhj@centrum.cz",
+  "license": "ISC"
+}
