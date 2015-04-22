@@ -14,6 +14,7 @@ $app->get('/', function () use ($app)
 
 $app->get('/facebook', function (Request $request) use ($app)
 {
+	//dump($_SERVER);
 	$fbUsername = '';
 	$fbId = '';
 	$messages = ['unread' => 0, 'unseen' => 0, 'threads' => []];
@@ -28,7 +29,7 @@ $app->get('/facebook', function (Request $request) use ($app)
 	{
 		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
 		$logoutUrl = '';
-		return $app['twig']->render('facebook.html', array(
+		return $app['twig']->render('facebook.twig', array(
 			'userLoggedIn'    => false,
 			'loginUrl'        => $loginUrl,
 			'logoutUrl'       => $logoutUrl,
@@ -44,7 +45,7 @@ $app->get('/facebook', function (Request $request) use ($app)
 	$fbId = $me->getId();
 	$messages = $fbClient->getMessages();
 
-	return $app['twig']->render('facebook.html', array(
+	return $app['twig']->render('facebook.twig', array(
 		'userLoggedIn'    => true,
 		'loginUrl'        => $loginUrl,
 		'logoutUrl'       => $logoutUrl,
