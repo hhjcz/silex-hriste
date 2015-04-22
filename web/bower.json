@@ -20,6 +20,6 @@
   ],
   "dependencies": {
     "backbone": "~1.1.2",
-    "foundation": "zurb/bower-foundation#~5.5.1"
+    "foundation": "zurb/bower-foundation#master"
   }
 }
