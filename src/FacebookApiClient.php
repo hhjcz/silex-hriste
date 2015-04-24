@@ -215,9 +215,9 @@ class FacebookApiClient {
 			$messageText = $messageInThreadGraph->getProperty('message');
 			$messageInThread['message'] = $this->htmlEncodeMessageString($messageText);
 			if ($i++ < sizeof($messagesInThreadGraph) - $threadGraph->getProperty('unread'))
-				$messageInThread['unread'] = false;
+				$messageInThread['status'] = 'read';
 			else
-				$messageInThread['unread'] = true;
+				$messageInThread['status'] = 'unread';
 			array_push($messagesInThread, $messageInThread);
 		}
 

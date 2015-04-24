@@ -7,14 +7,13 @@
     {% if userLoggedIn == true %}
         <div class="row">
             <div class="small-12 columns">
-                {% if not showAllMessages %}
-                    <a href="/facebook?showAllMessages=1" class="button tiny success">Show all</a>
-                {% endif %}
-                {% if showAllMessages %}
-                    <a href="/facebook?showAllMessages=0" class="button tiny success">Show unread</a>
-                {% endif %}
-                <span class="small-text"> thread: {{ messages.unread }} unread, {{ messages.unseen }} unseen </span>
+                {#Show all#}
+                <span class="switch small">
+                    <input id="showAllBtn" type="checkbox">
+                    <label for="showAllBtn"></label>
+                </span>
             </div>
+            <span class="small-text"> thread: {{ messages.unread }} unread, {{ messages.unseen }} unseen </span>
         </div>
 
         <div class="row">
@@ -29,14 +28,12 @@
                                     , unseen: {{ thread.unseen }}</span>
                                 <ul class="no-bullet">
                                     {% for message in thread.messages %}
-                                        {% if (message['unread'] or showAllMessages) %}
-                                            <li>
-                                                <span class="label secondary">{{ message.from }}:</span>
-                                                <span class="small-text">{{ message.created_time }}:</span>
+                                        <li class="message-{{ message.status }}">
+                                            <span class="label secondary">{{ message.from }}:</span>
+                                            <span class="small-text">{{ message.created_time }}:</span>
 
-                                                <div class="message-text">{{ message.message | raw }}</div>
-                                            </li>
-                                        {% endif %}
+                                            <div class="message-text">{{ message.message | raw }}</div>
+                                        </li>
                                     {% endfor %}
                                 </ul>
                             </li>

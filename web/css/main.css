@@ -31,6 +31,14 @@ div.message-text {
     color: #333333;
 }
 
+.message-read {
+    display: none;
+}
+
+.message-unread {
+    display: inherit;
+}
+
 .small-text {
     font-size: 0.6875rem;
 }
