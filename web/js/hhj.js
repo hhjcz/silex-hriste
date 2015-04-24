@@ -7,14 +7,20 @@ $(document).ready(function () {
 });
 
 var jqueryInit = function () {
-    console.log('Jo!');
     $('#showAllBtn').click(function() {
-        var checked = $('#showAllBtn').is(':checked');
-        if (checked) {
+        var checked = $('#showAllBtn').prop('checked');
+        if (!checked) {
             $('.message-read').css("display", "block");
+            $('#showAllBtn').prop('checked', true);
+            $('#showAllBtn').html('Show unread');
         } else {
             $('.message-read').css("display", "none");
+            $('#showAllBtn').prop('checked', false);
+            $('#showAllBtn').html('Show all');
         }
-        //$('#showAllLbl').html('Show unread');
+    });
+
+    $('#reloadBtn').click(function() {
+        location.reload();
     });
 }

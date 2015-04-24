@@ -188,7 +188,7 @@ class FacebookApiClient {
 		//{
 		//	$threadUsers .= $userGraph->getProperty('name') . ', ';
 		//}
-		$threadUsers .= $usersGraph->getProperty('0') ? ', ' . $usersGraph->getProperty('0')->getProperty('name') : '';
+		$threadUsers .= $usersGraph->getProperty('0') ? $usersGraph->getProperty('0')->getProperty('name') : '';
 		$threadUsers .= $usersGraph->getProperty('1') ? ', ' . $usersGraph->getProperty('1')->getProperty('name') : '';
 		$threadUsers .= $usersGraph->getProperty('2') ? ', ' . $usersGraph->getProperty('2')->getProperty('name') : '';
 		$threadUsers .= $usersGraph->getProperty('3') ? ', ' . $usersGraph->getProperty('3')->getProperty('name') : '';

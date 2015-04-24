@@ -5,54 +5,52 @@
 {% block content %}
 
     {% if userLoggedIn == true %}
-        <div class="row">
-            <div class="small-12 columns">
-                {#Show all#}
-                <span class="switch small">
-                    <input id="showAllBtn" type="checkbox">
-                    <label for="showAllBtn"></label>
-                </span>
-            </div>
-            <span class="small-text"> thread: {{ messages.unread }} unread, {{ messages.unseen }} unseen </span>
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        <a href="#" id="showAllBtn" class="button sucess tiny">Show all</a>
+        <a href="#" id="reloadBtn" class="button warning tiny">Reload</a>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 columns small-text"> Threads: {{ messages.unread }} unread, {{ messages.unseen }}
+        unseen </span>
+    </div>
 
-        <div class="row">
-            <div class="small-12 columns small-text">
-                <ul class="no-bullet">
-                    {% for thread in messages.threads %}
-                        {% if thread.unread > 0 or showAllMessages %}
-                            <hr>
-                            <li>
-                                <span class="label info">{{ thread.users }}: </span>
+    <div class="row">
+        <div class="small-12 columns small-text">
+            <ul class="no-bullet">
+                {% for thread in messages.threads %}
+                    <hr>
+                    <li>
+                        <span class="label info">{{ thread.users }}: </span>
                                 <span class="small-text"> unread: {{ thread.unread }}
                                     , unseen: {{ thread.unseen }}</span>
-                                <ul class="no-bullet">
-                                    {% for message in thread.messages %}
-                                        <li class="message-{{ message.status }}">
-                                            <span class="label secondary">{{ message.from }}:</span>
-                                            <span class="small-text">{{ message.created_time }}:</span>
+                        <ul class="no-bullet">
+                            {% for message in thread.messages %}
+                                <li class="message-{{ message.status }}">
+                                    <span class="label secondary">{{ message.from }}:</span>
+                                    <span class="small-text">{{ message.created_time }}:</span>
 
-                                            <div class="message-text">{{ message.message | raw }}</div>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
+                                    <div class="message-text">{{ message.message | raw }}</div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="small-12 columns">
-                Logged in as: {{ fbUserName }}, id: {{ fbId }}
-            </div>
+    <div class="row">
+        <div class="small-12 columns">
+            Logged in as: {{ fbUserName }}, id: {{ fbId }}
         </div>
-        <div class="row">
-            <div class="small-12 columns">
-                <a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>
-            </div>
+    </div>
+    <div class="row">
+        <div class="small-12 columns">
+            <a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>
         </div>
+    </div>
     {% endif %}
 
     {% if userLoggedIn == false %}
@@ -60,4 +58,4 @@
             <a class="button tiny" href="{{ loginUrl }}">Facebook login</a>
         </div>
     {% endif %}
-{% endblock %}
+    {% endblock %}
