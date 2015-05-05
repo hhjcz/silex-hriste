@@ -140,7 +140,7 @@ class FacebookApiClient {
 			$request = new FacebookRequest($this->session, 'GET', '/me/inbox', ['limit' => $limit]);
 			$response = $request->execute();
 			$inboxGraph = $response->getGraphObject();
-			//dump($messagesGraph);
+			//dump($inboxGraph);
 			$inbox = new stdClass();
 			$inbox->summary = $inboxGraph->getProperty('summary');
 			$inbox->unseen = $inbox->summary->getProperty('unseen_count');
@@ -156,6 +156,37 @@ class FacebookApiClient {
 	}
 
 	/**
+	 * @param $threadId
+	 * @param int $limit
+	 * @return GraphObject
+	 * @throws Exception
+	 * @throws FacebookRequestException
+	 */
+	public function getThread($threadId, $limit = 100)
+	{
+		try
+		{
+			$request = new FacebookRequest($this->session, 'GET', "/${threadId}", ['limit' => $limit]);
+			$response = $request->execute();
+			$threadGraph = $response->getGraphObject();
+			//dump($threadGraph);
+			$thread = new stdClass();
+			//$thread->summary = $threadGraph->getProperty('summary');
+			$thread->id = $threadGraph->getProperty('id');
+			$thread->users = $this->extractUsersFromThreadGraph($threadGraph, $thread);
+			$thread->unseen = $threadGraph->getProperty('unseen');
+			$thread->unread = $threadGraph->getProperty('unread');
+			$thread->messages = $this->extractMessagesFromThreadGraph($threadGraph);
+		} catch (FacebookRequestException $e)
+		{
+			throw $e;
+		}
+
+		//dump($inbox);
+		return $thread;
+	}
+
+	/**
 	 * @param $inboxGraph
 	 * @return array
 	 */
@@ -164,6 +195,7 @@ class FacebookApiClient {
 		$threads = [];
 		foreach ($inboxGraph->getPropertyAsArray('data') as $threadGraph)
 		{
+			$thread['id'] = $threadGraph->getProperty('id');
 			$thread['unseen'] = $threadGraph->getProperty('unseen');
 			$thread['unread'] = $threadGraph->getProperty('unread');
 
@@ -241,7 +273,7 @@ class FacebookApiClient {
 	 * @param $timestamp
 	 * @return string
 	 */
-	public  function prettifyTimestamp($timestamp)
+	public function prettifyTimestamp($timestamp)
 	{
 		$carbon = Carbon\Carbon::createFromFormat('Y-m-d\TG:i:s\+0000', $timestamp, 'UTC');
 		$carbon->setTimezone('Europe/Prague');

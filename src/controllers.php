@@ -12,31 +12,50 @@ $app->get('/', function () use ($app)
 })
 	->bind('homepage');
 
-$app->get('/facebook', function (Request $request) use ($app)
+$app->get('/facebook/thread/{threadId}', function (Request $request, $threadId) use ($app)
 {
-	//dump($_SERVER);
-	$fbUsername = '';
-	$fbId = '';
-	$messages = ['unread' => 0, 'unseen' => 0, 'threads' => []];
 	session_start();
 	$fbClient = new FacebookApiClient();
 	$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
 	if ($fbSession)
 	{
-		$loginUrl = '';
 		$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, $app['fb_redirect_login_url'] . '?logout');
 	} else
 	{
 		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
-		$logoutUrl = '';
-		return $app['twig']->render('facebook.twig', array(
-			'userLoggedIn'    => false,
-			'loginUrl'        => $loginUrl,
-			'logoutUrl'       => $logoutUrl,
-			'fbUserName'      => $fbUsername,
-			'fbId'            => $fbId,
-			'showAllMessages' => $request->query->get('showAllMessages') == 'true' ? true : false,
-			'messages'        => $messages
+		return $app['twig']->render('facebook-login.twig', array(
+			'loginUrl' => $loginUrl,
+		));
+	}
+
+	$me = $fbClient->getUserInfo();
+	$thread = $fbClient->getThread($threadId, $limit = 500);
+	$fbUsername = $me->getName();
+	$fbId = $me->getId();
+
+	return $app['twig']->render('facebook-thread.twig', array(
+		'logoutUrl'       => $logoutUrl,
+		'fbUserName'      => $fbUsername,
+		'fbId'            => $fbId,
+		'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
+		'thread'          => $thread
+	));
+});
+
+$app->get('/facebook', function (Request $request) use ($app)
+{
+	// TODO - refactor as login() function of better route filter (if silex supports it)
+	session_start();
+	$fbClient = new FacebookApiClient();
+	$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
+	if ($fbSession)
+	{
+		$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, $app['fb_redirect_login_url'] . '?logout');
+	} else
+	{
+		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
+		return $app['twig']->render('facebook-login.twig', array(
+			'loginUrl' => $loginUrl,
 		));
 	}
 
@@ -47,7 +66,6 @@ $app->get('/facebook', function (Request $request) use ($app)
 
 	return $app['twig']->render('facebook.twig', array(
 		'userLoggedIn'    => true,
-		'loginUrl'        => $loginUrl,
 		'logoutUrl'       => $logoutUrl,
 		'fbUserName'      => $fbUsername,
 		'fbId'            => $fbId,

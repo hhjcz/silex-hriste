@@ -22,9 +22,10 @@
                 {% for thread in messages.threads %}
                     <hr>
                     <li>
-                        <span class="label info">{{ thread.users }}: </span>
-                                <span class="small-text"> unread: {{ thread.unread }}
-                                    , unseen: {{ thread.unseen }}</span>
+                        <a href="/facebook/thread/{{ thread.id }}">
+                            <span class="label info">{{ thread.users }}:</span>
+                            <span class="small-text"> unread: {{ thread.unread }} , unseen: {{ thread.unseen }}</span>
+                        </a>
                         <ul class="no-bullet">
                             {% for message in thread.messages %}
                                 <li class="message-{{ message.status }}">
@@ -53,9 +54,4 @@
     </div>
     {% endif %}
 
-    {% if userLoggedIn == false %}
-        <div class="row">
-            <a class="button tiny" href="{{ loginUrl }}">Facebook login</a>
-        </div>
-    {% endif %}
     {% endblock %}
