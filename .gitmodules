@@ -1,0 +1,3 @@
+[submodule "web/contrib/ElasticSVGElements"]
+	path = web/contrib/ElasticSVGElements
+	url = git@github.com:hhjcz/ElasticSVGElements.git
