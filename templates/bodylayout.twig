@@ -1,59 +1,62 @@
-{%  extends "layout.twig" %}
+{% extends "layout.twig" %}
 
 {% block bodylayout %}
-<div class="fixed">
-    <nav class="top-bar" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="#">HHjovo hriste</a></h1>
-            </li>
-            <!--Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone-->
-            <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
-        </ul>
-
-        <section class="top-bar-section">
-            <ul class="right">
-                <li class="">
-                    <a class="text-left" href="/angular/">Angular</a>
+    <div class="fixed">
+        <nav class="top-bar" data-topbar role="navigation">
+            <ul class="title-area">
+                <li class="name">
+                    <h1><a href="/">HHjovo hriste</a></h1>
                 </li>
-                <li class="has-dropdown">
-                    <a href="#">Main Item 4</a>
-                    <ul class="dropdown">
-                        <li><label>Section Name</label></li>
-                        <li class="has-dropdown">
-                            <a href="#" class="">Has Dropdown, Level 1</a>
-                            <ul class="dropdown">
-                                <li><a href="#">Dropdown Options</a></li>
-                                <li class="active"><a href="#">Active Dropdown Options</a></li>
-                                <li class="has-dropdown">
-                                    <a href="#">Has Dropdown, Level 2</a>
-                                    <ul class="dropdown test">
-                                        <li><a href="#">Subdropdown Option</a></li>
-                                        <li><a href="#">Subdropdown Option</a></li>
-                                        <li><a href="#">Subdropdown Option</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="#">Subdropdown Option</a></li>
-                                <li><a href="#">Subdropdown Option</a></li>
-                                <li><a href="#">Subdropdown Option</a></li>
-                            </ul>
-                        </li>
-                        <li class="active"><a href="#">Active Dropdown Option</a></li>
-                        <li><a href="#">Dropdown Option</a></li>
-                        <li class="divider"></li>
-                        <li><label>Section Name</label></li>
-                        <li><a href="#">Dropdown Option</a></li>
-                        <li><a href="#">Dropdown Option</a></li>
-                        <li><a href="#">Dropdown Option</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">See all →</a></li>
-                    </ul>
-                </li>
+                <!--Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone-->
+                <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
             </ul>
-        </section>
-    </nav>
-</div>
 
-{% block content %}{% endblock %}
+            <section class="top-bar-section">
+                <ul class="right">
+                    <li class="">
+                        <a class="text-left" href="/angular/">Angular</a>
+                    </li>
+                    <li>
+                        <a class="text-left" href="/elasticbuttons">Buttons</a>
+                    </li>
+                    <li class="has-dropdown">
+                        <a href="#">Main Item 4</a>
+                        <ul class="dropdown">
+                            <li><label>Section Name</label></li>
+                            <li class="has-dropdown">
+                                <a href="#" class="">Has Dropdown, Level 1</a>
+                                <ul class="dropdown">
+                                    <li><a href="#">Dropdown Options</a></li>
+                                    <li class="active"><a href="#">Active Dropdown Options</a></li>
+                                    <li class="has-dropdown">
+                                        <a href="#">Has Dropdown, Level 2</a>
+                                        <ul class="dropdown test">
+                                            <li><a href="#">Subdropdown Option</a></li>
+                                            <li><a href="#">Subdropdown Option</a></li>
+                                            <li><a href="#">Subdropdown Option</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#">Subdropdown Option</a></li>
+                                    <li><a href="#">Subdropdown Option</a></li>
+                                    <li><a href="#">Subdropdown Option</a></li>
+                                </ul>
+                            </li>
+                            <li class="active"><a href="#">Active Dropdown Option</a></li>
+                            <li><a href="#">Dropdown Option</a></li>
+                            <li class="divider"></li>
+                            <li><label>Section Name</label></li>
+                            <li><a href="#">Dropdown Option</a></li>
+                            <li><a href="#">Dropdown Option</a></li>
+                            <li><a href="#">Dropdown Option</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">See all →</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </nav>
+    </div>
 
-{%  endblock %}
+    {% block content %}{% endblock %}
+
+{% endblock %}

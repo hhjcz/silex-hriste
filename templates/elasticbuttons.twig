@@ -1,0 +1,103 @@
+{% extends "bodylayout.twig" %}
+
+
+{% block title %}silex-hriste{% endblock %}
+
+{% block content %}
+
+<!-- codrops elastic buttons: -->
+<link rel="stylesheet" type="text/css" href="contrib/ElasticSVGElements/css/demo.css" />
+<link rel="stylesheet" type="text/css" href="contrib/ElasticSVGElements/css/button.css" />
+<script src="contrib/ElasticSVGElements/js/snap.svg-min.js"></script>
+
+    <div class="button-wrap">
+        <button class="button button--line button--effect-1">
+							<span class="morph-shape"
+                                  data-morph-active="M286,113c0,0-68.8,9-136,9c-78.2,0-137-9-137-9S3,97.198,3,62.5C3,33.999,13,12,13,12S72,2,150,2c85,0,136,10,136,10s11,17.598,11,52C297,96.398,286,113,286,113z">
+								<svg width="100%" height="100%" viewBox="0 0 300 125" preserveAspectRatio="none">
+                                    <path d="M286.5,113c0,0-104,0-136.5,0c-35.75,0-136.5,0-136.5,0s0-39.417,0-52.5c0-12.167,0-48.5,0-48.5s101.833,0,136.5,0c33.583,0,136.5,0,136.5,0s0,35.917,0,48.5C286.5,73.167,286.5,113,286.5,113z" />
+                                </svg>
+							</span>
+            <span class="button__text">Press me</span>
+        </button>
+        <button class="button button--line button--effect-1">
+							<span class="morph-shape"
+                                  data-morph-active="M282.5,62.5c0,27.891-8.648,51.994-36.5,50.5c-24.049-1.29-44.75-8-96-8c-56.75,0-71.952,6.71-96,8c-27.851,1.494-36.5-22.609-36.5-50.5l0,0C17.5,34.609,26.215,9.572,54,12c23.973,2.095,39.75,7,96,7c51.502,0,72.01-5.125,96-7C273.807,9.827,282.5,34.609,282.5,62.5L282.5,62.5z">
+								<svg width="100%" height="100%" viewBox="0 0 300 125" preserveAspectRatio="none">
+                                    <path d="M286.5,62.5c0,27.891-12.609,50.5-40.5,50.5c-44.25,0-44.75,0-96,0c-56.75,0-56.5,0-96,0c-27.891,0-40.5-22.609-40.5-50.5l0,0C13.5,34.609,26.109,12,54,12c39.5,0,39.75,0,96,0c51.502,0,51.5,0,96,0C273.891,12,286.5,34.609,286.5,62.5L286.5,62.5z" />
+                                </svg>
+							</span>
+            <span class="button__text">Hold me</span>
+        </button>
+    </div>
+
+    <script>
+        (function () {
+
+            function extend(a, b) {
+                for (var key in b) {
+                    if (b.hasOwnProperty(key)) {
+                        a[key] = b[key];
+                    }
+                }
+                return a;
+            }
+
+            function SVGButton(el, options) {
+                this.el = el;
+                this.options = extend({}, this.options);
+                extend(this.options, options);
+                this.init();
+            }
+
+            SVGButton.prototype.options = {
+                speed: {reset: 800, active: 150},
+                easing: {reset: mina.elastic, active: mina.easein}
+            };
+
+            SVGButton.prototype.init = function () {
+                this.shapeEl = this.el.querySelector('span.morph-shape');
+
+                var s = Snap(this.shapeEl.querySelector('svg'));
+                this.pathEl = s.select('path');
+                this.paths = {
+                    reset: this.pathEl.attr('d'),
+                    active: this.shapeEl.getAttribute('data-morph-active')
+                };
+
+                this.initEvents();
+            };
+
+            SVGButton.prototype.initEvents = function () {
+                this.el.addEventListener('mousedown', this.down.bind(this));
+                this.el.addEventListener('touchstart', this.down.bind(this));
+
+                this.el.addEventListener('mouseup', this.up.bind(this));
+                this.el.addEventListener('touchend', this.up.bind(this));
+
+                this.el.addEventListener('mouseout', this.up.bind(this));
+            };
+
+            SVGButton.prototype.down = function () {
+                this.pathEl.stop().animate({'path': this.paths.active}, this.options.speed.active, this.options.easing.active);
+            };
+
+            SVGButton.prototype.up = function () {
+                this.pathEl.stop().animate({'path': this.paths.reset}, this.options.speed.reset, this.options.easing.reset);
+            };
+
+            [].slice.call(document.querySelectorAll('button.button--effect-1')).forEach(function (el) {
+                new SVGButton(el);
+            });
+
+            [].slice.call(document.querySelectorAll('button.button--effect-2')).forEach(function (el) {
+                new SVGButton(el, {
+                    speed: {reset: 650, active: 650},
+                    easing: {reset: mina.elastic, active: mina.elastic}
+                });
+            });
+
+        })();
+    </script>
+{% endblock %}
+

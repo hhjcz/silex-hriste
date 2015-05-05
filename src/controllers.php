@@ -61,6 +61,11 @@ $app->get('/facebook', function (Request $request) use ($app)
 //	return $app->redirect('/angular');
 //})->assert('url', '.+');
 
+$app->get('/elasticbuttons', function (Request $request) use ($app)
+{
+	return $app['twig']->render('elasticbuttons.twig');
+});
+
 $app->error(function (\Exception $e, Request $request, $code) use ($app)
 {
 	if ($app['debug'])
