@@ -23,11 +23,12 @@ END:STANDARD
 END:VTIMEZONE
 {% for event in events %}
 BEGIN:VEVENT
-UID: {{ event.uid }}
-DTSTAMP: {{ event.dtstamp }}
-DTSTART: {{ event.dtstart }}
-DTEND: {{ event.dtend }}
-SUMMARY: {{ event.summary }}
+UID:{{ event.uid }}
+DTSTAMP:{{ event.dtstamp }}
+DTSTART;VALUE=DATE:{{ event.dtstart }}
+DTEND;VALUE=DATE:{{ event.dtend }}
+SUMMARY:{{ event.summary }}
+DESCRIPTION:http://oris.orientacnisporty.cz/Zavod?id={{ event.eventid }}
 END:VEVENT
 {% endfor %}
 END:VCALENDAR
