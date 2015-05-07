@@ -74,6 +74,21 @@ $app->get('/facebook', function (Request $request) use ($app)
 	));
 });
 
+$app->get('/oris/calendar4.ics', function (Request $request) use ($app)
+{
+	$orisClient = new OrisApiClient();
+	$orisClient->getUserEventEntries();
+
+	$content = $app['twig']->render('calendar.twig', ['events' => $events]);
+
+	//set correct content-type-header
+	$response = new Response($content, 200);
+	//$response->headers->set('Content-type', 'text/calendar; charset=utf-8');
+	//$response->headers->set('Content-Disposition', 'inline; filename=calendar.ics');
+
+	return $response;
+});
+
 //$app->get('{url}', function () use ($app)
 //{
 //	return $app->redirect('/angular');
