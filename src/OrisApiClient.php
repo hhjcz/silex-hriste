@@ -30,15 +30,19 @@ class OrisApiClient {
 	 * @param string $userId
 	 * @return array
 	 */
-	public function getUserEventEntries($userId = null)
+	public function getUserEventEntries($userId = null, $fromDate = null)
 	{
 		if ( ! $userId) $userId = self::USER_ID;
+		if ( ! $fromDate) $fromDate = date('Y-m-d');
+		$toDate = '2099-12-31';
 
 		$res = $this->guzzle->get($this->apiEndpoint, [
 			'query' => [
-				'method' => 'getUserEventEntries',
-				'format' => $this->format,
-				'userid' => $userId
+				'method'   => 'getUserEventEntries',
+				'format'   => $this->format,
+				'userid'   => $userId,
+				'dateFrom' => $fromDate,
+				'dateTo'   => $toDate,
 			],
 		]);
 		if ($eventsResponse = $res->json())
