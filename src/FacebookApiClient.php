@@ -220,11 +220,18 @@ class FacebookApiClient {
 		//{
 		//	$threadUsers .= $userGraph->getProperty('name') . ', ';
 		//}
-		$threadUsers .= $usersGraph->getProperty('0') ? $usersGraph->getProperty('0')->getProperty('name') : '';
-		$threadUsers .= $usersGraph->getProperty('1') ? ', ' . $usersGraph->getProperty('1')->getProperty('name') : '';
-		$threadUsers .= $usersGraph->getProperty('2') ? ', ' . $usersGraph->getProperty('2')->getProperty('name') : '';
-		$threadUsers .= $usersGraph->getProperty('3') ? ', ' . $usersGraph->getProperty('3')->getProperty('name') : '';
-		$threadUsers .= $usersGraph->getProperty('4') ? ', ' . $usersGraph->getProperty('4')->getProperty('name') : '';
+		//$threadUsers .= $usersGraph->getProperty('0') ? $usersGraph->getProperty('0')->getProperty('name') : '';
+		$separator = '';
+		foreach (range(0, 30) as $key)
+		{
+			if ( ! $usersGraph->getProperty('' . $key)) continue;
+
+			$threadUser = $usersGraph->getProperty('' . $key)->getProperty('name');
+			if ($threadUser == 'Honza Haering') continue;
+
+			$threadUsers .= $separator . $threadUser;
+			$separator = ', ';
+		}
 
 		return $threadUsers;
 	}
