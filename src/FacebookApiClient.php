@@ -130,13 +130,16 @@ class FacebookApiClient {
 	}
 
 	/**
+	 * @param int $limit
 	 * @return GraphObject
+	 * @throws Exception
 	 * @throws FacebookRequestException
 	 */
 	public function getMessages($limit = 5)
 	{
 		try
 		{
+			//$request = new FacebookRequest($this->session, 'GET', '/390523424453383/comments', ['limit' => $limit]);
 			$request = new FacebookRequest($this->session, 'GET', '/me/inbox', ['limit' => $limit]);
 			$response = $request->execute();
 			$inboxGraph = $response->getGraphObject();
@@ -176,7 +179,17 @@ class FacebookApiClient {
 			$thread->users = $this->extractUsersFromThreadGraph($threadGraph, $thread);
 			$thread->unseen = $threadGraph->getProperty('unseen');
 			$thread->unread = $threadGraph->getProperty('unread');
-			$thread->messages = $this->extractMessagesFromThreadGraph($threadGraph);
+
+			$request = new FacebookRequest($this->session, 'GET', "/${threadId}/comments", ['limit' => $limit]);
+			$response = $request->execute();
+			// TODO - moznost strankovani...
+			//	$response = $response->getRequestForNextPage()->execute();
+			$messagesInThreadGraph = $response->getGraphObject();
+			//dump($threadGraph);
+			$thread->previousPageRequest = $response->getRequestForPreviousPage();
+			$thread->nextPageRequest = $response->getRequestForNextPage();
+
+			$thread->messages = $this->extractMessagesFromThreadGraph($threadGraph, $messagesInThreadGraph);
 		} catch (FacebookRequestException $e)
 		{
 			throw $e;
@@ -201,7 +214,8 @@ class FacebookApiClient {
 
 			$thread['users'] = $this->extractUsersFromThreadGraph($threadGraph, $thread);
 
-			$thread['messages'] = $this->extractMessagesFromThreadGraph($threadGraph);
+			$messagesInThreadGraph = $threadGraph->getProperty('comments');
+			$thread['messages'] = $this->extractMessagesFromThreadGraph($threadGraph, $messagesInThreadGraph);
 			$threads[] = $thread;
 		}
 
@@ -237,12 +251,12 @@ class FacebookApiClient {
 	}
 
 	/**
-	 * @param $threadGraph
+	 * @param GraphObject $threadGraph
+	 * @param GraphObject $messagesInThreadGraph
 	 * @return array
 	 */
-	private function extractMessagesFromThreadGraph($threadGraph)
+	private function extractMessagesFromThreadGraph($threadGraph, $messagesInThreadGraph)
 	{
-		$messagesInThreadGraph = $threadGraph->getProperty('comments');
 		if ($messagesInThreadGraph instanceof GraphObject) $messagesInThreadGraph = $messagesInThreadGraph->getPropertyAsArray('data');
 		else return [];
 		$messagesInThread = [];
