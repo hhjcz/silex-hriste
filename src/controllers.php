@@ -12,67 +12,9 @@ $app->get('/', function () use ($app)
 })
 	->bind('homepage');
 
-$app->get('/facebook/thread/{threadId}', function (Request $request, $threadId) use ($app)
-{
-	session_start();
-	$fbClient = new FacebookApiClient();
-	$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
-	if ($fbSession)
-	{
-		$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, $app['fb_redirect_login_url'] . '?logout');
-	} else
-	{
-		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
-		return $app['twig']->render('facebook-login.twig', array(
-			'loginUrl' => $loginUrl,
-		));
-	}
+$app->get('/facebook/thread/{threadId}', 'FacebookController::showThread');
 
-	$me = $fbClient->getUserInfo();
-	$thread = $fbClient->getThread($threadId, $limit = 500);
-	$fbUsername = $me->getName();
-	$fbId = $me->getId();
-
-	return $app['twig']->render('facebook-thread.twig', array(
-		'logoutUrl'       => $logoutUrl,
-		'fbUserName'      => $fbUsername,
-		'fbId'            => $fbId,
-		'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
-		'thread'          => $thread
-	));
-});
-
-$app->get('/facebook', function (Request $request) use ($app)
-{
-	// TODO - refactor as login() function of better route filter (if silex supports it)
-	session_start();
-	$fbClient = new FacebookApiClient();
-	$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
-	if ($fbSession)
-	{
-		$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, $app['fb_redirect_login_url'] . '?logout');
-	} else
-	{
-		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
-		return $app['twig']->render('facebook-login.twig', array(
-			'loginUrl' => $loginUrl,
-		));
-	}
-
-	$me = $fbClient->getUserInfo();
-	$fbUsername = $me->getName();
-	$fbId = $me->getId();
-	$messages = $fbClient->getMessages($limit = 5);
-
-	return $app['twig']->render('facebook.twig', array(
-		'userLoggedIn'    => true,
-		'logoutUrl'       => $logoutUrl,
-		'fbUserName'      => $fbUsername,
-		'fbId'            => $fbId,
-		'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
-		'messages'        => $messages
-	));
-});
+$app->get('/facebook', 'FacebookController::showInbox');
 
 $app->get('/oris/calendar.ics', function (Request $request) use ($app)
 {

@@ -11,27 +11,38 @@
         </div>
     </div>
 
+
     <div class="row">
         <div class="small-12 columns">
             <ul class="no-bullet">
+                <li>
+                    <a href="/facebook/thread/{{ thread.id }}?until={{ thread.nextPage.until }}&limit={{ thread.nextPage.limit }}&__paging_token={{ thread.nextPage.__paging_token }}">
+                        previous
+                    </a>
+                </li>
                 <li>
                     <span class="label info">{{ thread.users }}:</span>
                     <span class="small-text"> unread: {{ thread.unread }} , unseen: {{ thread.unseen }}</span>
                     <ul class="no-bullet">
                         {% for message in thread.messages %}
                             <li class="message-{{ message.status }}">
-                                <span class="label secondary">{{ message.from }}:</span>
-                                <span class="small-text">{{ message.created_time }}:</span>
+                                <span class="label secondary">{{ message.from }}</span>
+                                <span class="small-text">{{ message.created_time }}</span>
+                                <span class="small-text"> #{{ message.id }}</span>
 
                                 <div class="message-text">{{ message.message | raw }}</div>
                             </li>
                         {% endfor %}
                     </ul>
                 </li>
+                <li>
+                    <a href="/facebook/thread/{{ thread.id }}?since={{ thread.previousPage.since }}&__previous={{ thread.previousPage.__previous }}&limit={{ thread.previousPage.limit }}&__paging_token={{ thread.previousPage.__paging_token }}">
+                        next
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
-
     <div class="row">
         <div class="small-12 columns">
             Logged in as: {{ fbUserName }}, id: {{ fbId }}

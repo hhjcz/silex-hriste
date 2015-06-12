@@ -3,6 +3,7 @@
 use Facebook\FacebookRedirectLoginHelper;
 use Facebook\FacebookRequest;
 use Facebook\FacebookRequestException;
+use Facebook\FacebookResponse;
 use Facebook\FacebookSession;
 use Facebook\GraphObject;
 use Facebook\GraphUser;
@@ -160,15 +161,16 @@ class FacebookApiClient {
 
 	/**
 	 * @param $threadId
-	 * @param int $limit
+	 * @param array $paging
 	 * @return GraphObject
 	 * @throws Exception
 	 * @throws FacebookRequestException
 	 */
-	public function getThread($threadId, $limit = 100)
+	public function getThread($threadId, $paging)
 	{
 		try
 		{
+			$limit = $paging['limit'] ?: 30;
 			$request = new FacebookRequest($this->session, 'GET', "/${threadId}", ['limit' => $limit]);
 			$response = $request->execute();
 			$threadGraph = $response->getGraphObject();
@@ -180,14 +182,20 @@ class FacebookApiClient {
 			$thread->unseen = $threadGraph->getProperty('unseen');
 			$thread->unread = $threadGraph->getProperty('unread');
 
-			$request = new FacebookRequest($this->session, 'GET', "/${threadId}/comments", ['limit' => $limit]);
+			$request = new FacebookRequest($this->session,
+				'GET', "/${threadId}/comments", [
+					'since'          => $paging['since'],
+					'until'          => $paging['until'],
+					'__previous'     => $paging['__previous'],
+					'limit'          => $limit,
+					'__paging_token' => $paging['__paging_token']
+				]);
 			$response = $request->execute();
-			// TODO - moznost strankovani...
-			//	$response = $response->getRequestForNextPage()->execute();
 			$messagesInThreadGraph = $response->getGraphObject();
 			//dump($threadGraph);
-			$thread->previousPageRequest = $response->getRequestForPreviousPage();
-			$thread->nextPageRequest = $response->getRequestForNextPage();
+			$paging = $this->extractPagingFromResponse($response);
+			$thread->previousPage = $paging['previous'];
+			$thread->nextPage = $paging['next'];
 
 			$thread->messages = $this->extractMessagesFromThreadGraph($threadGraph, $messagesInThreadGraph);
 		} catch (FacebookRequestException $e)
@@ -195,8 +203,34 @@ class FacebookApiClient {
 			throw $e;
 		}
 
-		//dump($inbox);
 		return $thread;
+	}
+
+	/**
+	 * @param FacebookResponse $response
+	 * @return array paging parameters
+	 */
+	private function extractPagingFromResponse(FacebookResponse $response)
+	{
+		$nextPage = $response->getRequestForNextPage()->getParameters();
+		$previousPage = $response->getRequestForPreviousPage()->getParameters();
+		//dump($previousPage);
+		$pagingParams = [
+			'next'     => [
+				//'until'          => 1419968964 ?: $nextPage['until'],
+				'until'          => $nextPage['until'],
+				'__paging_token' => $nextPage['__paging_token'],
+				'limit'          => $nextPage['limit']
+			],
+			'previous' => [
+				'__previous'     => $previousPage['__previous'],
+				'since'          => $previousPage['since'],
+				'__paging_token' => $previousPage['__paging_token'],
+				'limit'          => $previousPage['limit']
+			],
+		];
+
+		return $pagingParams;
 	}
 
 	/**
@@ -263,6 +297,8 @@ class FacebookApiClient {
 		$i = 0;
 		foreach ($messagesInThreadGraph as $messageInThreadGraph)
 		{
+			//dump($messageInThreadGraph);
+			list($nic, $messageInThread['id']) = preg_split('/\_/', $messageInThreadGraph->getProperty('id'));
 			$messageInThread['from'] = $messageInThreadGraph->getProperty('from')->getProperty('name');
 			$messageInThread['created_time'] = $this->prettifyTimestamp('' . $messageInThreadGraph->getProperty('created_time'));
 			$messageText = $messageInThreadGraph->getProperty('message');
