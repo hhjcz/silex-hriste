@@ -16,7 +16,7 @@
         <div class="small-12 columns">
             <ul class="no-bullet">
                 <li>
-                    <a href="/facebook/thread/{{ thread.id }}?until={{ thread.nextPage.until }}&limit={{ thread.nextPage.limit }}&__paging_token={{ thread.nextPage.__paging_token }}">
+                    <a href="/facebook/thread/{{ thread.id }}?until={{ thread.nextPage.until }}&since={{ thread.nextPage.since }}&__previous={{ thread.nextPage.__previous }}&limit={{ thread.nextPage.limit }}&__paging_token={{ thread.nextPage.__paging_token }}">
                         previous
                     </a>
                 </li>
@@ -36,7 +36,7 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="/facebook/thread/{{ thread.id }}?since={{ thread.previousPage.since }}&__previous={{ thread.previousPage.__previous }}&limit={{ thread.previousPage.limit }}&__paging_token={{ thread.previousPage.__paging_token }}">
+                    <a href="/facebook/thread/{{ thread.id }}?until={{ thread.previousPage.until }}&since={{ thread.previousPage.since }}&__previous={{ thread.previousPage.__previous }}&limit={{ thread.previousPage.limit }}&__paging_token={{ thread.previousPage.__paging_token }}">
                         next
                     </a>
                 </li>

@@ -212,19 +212,30 @@ class FacebookApiClient {
 	 */
 	private function extractPagingFromResponse(FacebookResponse $response)
 	{
-		$nextPage = $response->getRequestForNextPage()->getParameters();
-		$previousPage = $response->getRequestForPreviousPage()->getParameters();
+		$nextPage = $response->getRequestForNextPage();
+		if ($nextPage instanceof FacebookRequest) $nextPage = $nextPage->getParameters();
+		else $nextPage = $response->getRequest()->getParameters();
+
+		$previousPage = $response->getRequestForPreviousPage();
+		if ($previousPage instanceof FacebookRequest) $previousPage = $previousPage->getParameters();
+		else $previousPage = $response->getRequest()->getParameters();
+
+		//dump($nextPage);
 		//dump($previousPage);
+
 		$pagingParams = [
 			'next'     => [
-				//'until'          => 1419968964 ?: $nextPage['until'],
+				//'until'          => 1419969997 ?: $nextPage['until'],
 				'until'          => $nextPage['until'],
+				'__previous'     => isset($nextPage['__previous']) ? $nextPage['__previous'] : null,
+				'since'          => isset($nextPage['since']) ? $nextPage['since'] : null,
 				'__paging_token' => $nextPage['__paging_token'],
 				'limit'          => $nextPage['limit']
 			],
 			'previous' => [
 				'__previous'     => $previousPage['__previous'],
 				'since'          => $previousPage['since'],
+				'until'          => isset($previousPage['until']) ? $previousPage['until']: null,
 				'__paging_token' => $previousPage['__paging_token'],
 				'limit'          => $previousPage['limit']
 			],
@@ -298,7 +309,12 @@ class FacebookApiClient {
 		foreach ($messagesInThreadGraph as $messageInThreadGraph)
 		{
 			//dump($messageInThreadGraph);
-			list($nic, $messageInThread['id']) = preg_split('/\_/', $messageInThreadGraph->getProperty('id'));
+			$messageId = $messageInThreadGraph->getProperty('id');
+			list($nic, $messageInThread['id']) = preg_split('/\_/', $messageId);
+
+			//dump($messageId);
+			//dump((new FacebookRequest($this->session, 'GET', "/$messageId"))->execute());
+
 			$messageInThread['from'] = $messageInThreadGraph->getProperty('from')->getProperty('name');
 			$messageInThread['created_time'] = $this->prettifyTimestamp('' . $messageInThreadGraph->getProperty('created_time'));
 			$messageText = $messageInThreadGraph->getProperty('message');
