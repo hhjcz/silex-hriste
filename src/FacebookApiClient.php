@@ -1,5 +1,6 @@
 <?php
 
+use Doctrine\DBAL\Connection;
 use Facebook\FacebookRedirectLoginHelper;
 use Facebook\FacebookRequest;
 use Facebook\FacebookRequestException;
@@ -7,6 +8,8 @@ use Facebook\FacebookResponse;
 use Facebook\FacebookSession;
 use Facebook\GraphObject;
 use Facebook\GraphUser;
+use Silex\Application;
+use Silex\Application\MonologTrait;
 
 /**
  *
@@ -14,10 +17,19 @@ use Facebook\GraphUser;
  */
 class FacebookApiClient {
 
+	use MonologTrait;
+
 	/** @var FacebookRedirectLoginHelper */
 	private $fbHelper;
 	/** @var  FacebookSession */
 	private $session;
+	/** @var  Application */
+	private $app;
+
+	public function __construct(Application $app)
+	{
+		$this->app = $app;
+	}
 
 	public function authenticate($api_key, $api_secret, $redirect_login_url)
 	{
@@ -197,13 +209,57 @@ class FacebookApiClient {
 			$thread->previousPage = $paging['previous'];
 			$thread->nextPage = $paging['next'];
 
-			$thread->messages = $this->extractMessagesFromThreadGraph($threadGraph, $messagesInThreadGraph);
+			$thread->messages = $this->extractMessagesFromThreadGraph($messagesInThreadGraph, $thread->unread);
 		} catch (FacebookRequestException $e)
 		{
 			throw $e;
 		}
 
 		return $thread;
+	}
+
+	/**
+	 * @param int $threadId
+	 * @param int $limit
+	 * @return int
+	 * @throws Exception
+	 * @throws FacebookRequestException
+	 */
+	public function countThread($threadId, $limit = 300)
+	{
+		try
+		{
+			$since = $this->getLatestPersistedMessage($threadId);
+			$request = new FacebookRequest($this->session, 'GET', "/${threadId}/comments", [
+				'limit' => $limit,
+				'since' => $since
+			]);
+			$i = 0;
+			$newCount = 0;
+			while ($request instanceof FacebookRequest && $i++ < 600)
+			{
+				$response = $request->execute();
+
+				$messages = $this->extractMessagesFromThreadGraph($response->getGraphObject(), 0);
+				$this->persistMessages($threadId, $messages);
+				$newCount += sizeof($messages);
+				$this->app['monolog']->addDebug(sprintf("Pocet zprav so far: %d.", $newCount));
+
+				if ($since > 0)
+					$request = $response->getRequestForPreviousPage();
+				else
+					$request = $response->getRequestForNextPage();
+				usleep(700000);
+			}
+
+			$totalCount = $this->getPersistedMessagesCount($threadId);
+		} catch (FacebookRequestException $e)
+		{
+			throw $e;
+		}
+
+		return ['totalCount' => $totalCount, 'newCount' => $newCount];
+
 	}
 
 	/**
@@ -235,7 +291,7 @@ class FacebookApiClient {
 			'previous' => [
 				'__previous'     => $previousPage['__previous'],
 				'since'          => $previousPage['since'],
-				'until'          => isset($previousPage['until']) ? $previousPage['until']: null,
+				'until'          => isset($previousPage['until']) ? $previousPage['until'] : null,
 				'__paging_token' => $previousPage['__paging_token'],
 				'limit'          => $previousPage['limit']
 			],
@@ -260,7 +316,7 @@ class FacebookApiClient {
 			$thread['users'] = $this->extractUsersFromThreadGraph($threadGraph, $thread);
 
 			$messagesInThreadGraph = $threadGraph->getProperty('comments');
-			$thread['messages'] = $this->extractMessagesFromThreadGraph($threadGraph, $messagesInThreadGraph);
+			$thread['messages'] = $this->extractMessagesFromThreadGraph($messagesInThreadGraph, $thread['unread']);
 			$threads[] = $thread;
 		}
 
@@ -296,11 +352,11 @@ class FacebookApiClient {
 	}
 
 	/**
-	 * @param GraphObject $threadGraph
 	 * @param GraphObject $messagesInThreadGraph
+	 * @param int $unread
 	 * @return array
 	 */
-	private function extractMessagesFromThreadGraph($threadGraph, $messagesInThreadGraph)
+	private function extractMessagesFromThreadGraph($messagesInThreadGraph, $unread)
 	{
 		if ($messagesInThreadGraph instanceof GraphObject) $messagesInThreadGraph = $messagesInThreadGraph->getPropertyAsArray('data');
 		else return [];
@@ -316,10 +372,14 @@ class FacebookApiClient {
 			//dump((new FacebookRequest($this->session, 'GET', "/$messageId"))->execute());
 
 			$messageInThread['from'] = $messageInThreadGraph->getProperty('from')->getProperty('name');
-			$messageInThread['created_time'] = $this->prettifyTimestamp('' . $messageInThreadGraph->getProperty('created_time'));
+			$messageInThread['from_id'] = $messageInThreadGraph->getProperty('from')->getProperty('id');
+			$messageInThread['created_time'] = $this->prettifyTimestamp('' . $messageInThreadGraph->getProperty('created_time'))
+				->formatLocalized('%a %d %b %H:%M');
+			$messageInThread['created_timestamp'] = $this->prettifyTimestamp('' . $messageInThreadGraph->getProperty('created_time'))
+				->timestamp;
 			$messageText = $messageInThreadGraph->getProperty('message');
 			$messageInThread['message'] = $this->htmlEncodeMessageString($messageText);
-			if ($i++ < sizeof($messagesInThreadGraph) - $threadGraph->getProperty('unread'))
+			if ($i++ < sizeof($messagesInThreadGraph) - $unread)
 				$messageInThread['status'] = 'read';
 			else
 				$messageInThread['status'] = 'unread';
@@ -344,7 +404,7 @@ class FacebookApiClient {
 
 	/**
 	 * @param $timestamp
-	 * @return string
+	 * @return Carbon\Carbon
 	 */
 	public function prettifyTimestamp($timestamp)
 	{
@@ -352,6 +412,49 @@ class FacebookApiClient {
 		$carbon->setTimezone('Europe/Prague');
 		setlocale(LC_TIME, 'cs_CZ');
 
-		return $carbon->formatLocalized('%a %d %b %H:%M');
+		return $carbon;
+	}
+
+	private function persistMessages($threadId, $messages)
+	{
+		/** @var Connection $db */
+		$db = $this->app['db'];
+		$sql = 'INSERT OR IGNORE INTO Messages (id, thread_id, from_id, from_name, text, created_time) VALUES (?, ?, ?, ?, ?, ?)';
+		$stmt = $db->prepare($sql);
+		$db->beginTransaction();
+		foreach ($messages as $message)
+		{
+			$stmt->execute([
+				$message['id'],
+				$threadId,
+				$message['from_id'],
+				$message['from'],
+				$message['message'],
+				$message['created_timestamp']
+			]);
+		}
+		$db->commit();
+		//dump($message);
+
+	}
+
+	private function getLatestPersistedMessage($threadId)
+	{
+		/** @var Connection $db */
+		$db = $this->app['db'];
+		$sql = "SELECT MAX(id) AS max_id FROM Messages WHERE thread_id = $threadId";
+		$result = $db->fetchAssoc($sql);
+
+		return isset($result['max_id']) && $result['max_id'] > 0 ? $result['max_id'] : 0;
+	}
+
+	private function getPersistedMessagesCount($threadId)
+	{
+		/** @var Connection $db */
+		$db = $this->app['db'];
+		$sql = "SELECT COUNT(*) AS pocet FROM Messages WHERE thread_id = $threadId";
+		$result = $db->fetchAssoc($sql);
+
+		return $result['pocet'];
 	}
 }

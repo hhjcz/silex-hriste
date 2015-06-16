@@ -36,7 +36,7 @@ class FacebookApiClientTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function should_prettify_timestamp()
 	{
-		$prettyTime = $this->object->prettifyTimestamp('2015-04-20T14:43:51+0000');
+		$prettyTime = $this->object->prettifyTimestamp('2015-04-20T14:43:51+0000')->formatLocalized('%a %d %b %H:%M');
 		$this->assertInternalType('string', $prettyTime);
 	}
 

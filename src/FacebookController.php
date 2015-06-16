@@ -1,6 +1,5 @@
 <?php
 
-use Facebook\FacebookRequest;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -10,10 +9,43 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class FacebookController {
 
+	public function showInbox(Request $request, Application $app)
+	{
+		// TODO - refactor as login() function of better route filter (if silex supports it)
+		session_start();
+		$fbClient = new FacebookApiClient($app);
+		$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
+		if ($fbSession)
+		{
+			$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, $app['fb_redirect_login_url'] . '?logout');
+		} else
+		{
+			$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
+			return $app['twig']->render('facebook-login.twig', array(
+				'loginUrl' => $loginUrl,
+			));
+		}
+
+		$me = $fbClient->getUserInfo();
+		$fbUsername = $me->getName();
+		$fbId = $me->getId();
+		$messages = $fbClient->getMessages($limit = 5);
+
+		return $app['twig']->render('facebook.twig', array(
+			'userLoggedIn'    => true,
+			'logoutUrl'       => $logoutUrl,
+			'fbUserName'      => $fbUsername,
+			'fbId'            => $fbId,
+			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
+			'messages'        => $messages
+		));
+
+	}
+
 	public function showThread(Request $request, Application $app, $threadId)
 	{
 		session_start();
-		$fbClient = new FacebookApiClient();
+		$fbClient = new FacebookApiClient($app);
 		$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
 		if ($fbSession)
 		{
@@ -44,11 +76,10 @@ class FacebookController {
 		));
 	}
 
-	public function showInbox(Request $request, Application $app)
+	public function countThread(Request $request, Application $app, $threadId)
 	{
-		// TODO - refactor as login() function of better route filter (if silex supports it)
 		session_start();
-		$fbClient = new FacebookApiClient();
+		$fbClient = new FacebookApiClient($app);
 		$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
 		if ($fbSession)
 		{
@@ -61,20 +92,22 @@ class FacebookController {
 			));
 		}
 
-		$me = $fbClient->getUserInfo();
-		$fbUsername = $me->getName();
-		$fbId = $me->getId();
-		$messages = $fbClient->getMessages($limit = 5);
+		$messageCount = $fbClient->countThread($threadId);
 
-		return $app['twig']->render('facebook.twig', array(
-			'userLoggedIn'    => true,
-			'logoutUrl'       => $logoutUrl,
-			'fbUserName'      => $fbUsername,
-			'fbId'            => $fbId,
-			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
-			'messages'        => $messages
+		return $app['twig']->render('facebook-thread-count.twig', array(
+			'logoutUrl' => $logoutUrl,
+			'threadId'  => $threadId,
+			'totalCount' => $messageCount['totalCount'],
+			'newCount'   => $messageCount['newCount'],
 		));
+	}
 
+	public function zkouska(Request $request, Application $app)
+	{
+		$fbClient = new FacebookApiClient($app);
+		$sql = "INSERT INTO Messages VALUES (1, 2, 3, 'Honza', 'Zprava', 0)";
+		$app['db']->exec($sql);
+		return;
 	}
 
 	private function getPaging(Request $request)

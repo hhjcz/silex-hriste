@@ -12,9 +12,13 @@ $app->get('/', function () use ($app)
 })
 	->bind('homepage');
 
+$app->get('/facebook/thread/count/{threadId}', 'FacebookController::countThread');
+
 $app->get('/facebook/thread/{threadId}', 'FacebookController::showThread');
 
 $app->get('/facebook', 'FacebookController::showInbox');
+
+$app->get('/facebook/zkouska', 'FacebookController::zkouska');
 
 $app->get('/oris/calendar.ics', function (Request $request) use ($app)
 {
