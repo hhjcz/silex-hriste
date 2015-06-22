@@ -230,10 +230,12 @@ class FacebookApiClient {
 		try
 		{
 			$since = $this->getLatestPersistedMessage($threadId);
-			$request = new FacebookRequest($this->session, 'GET', "/${threadId}/comments", [
-				'limit' => $limit,
-				'since' => $since
-			]);
+			$initialParams['limit'] = $limit;
+			if ($since > 0) {
+				$initialParams['since'] = $since;
+				$initialParams['__previous'] = 1;
+			}
+			$request = new FacebookRequest($this->session, 'GET', "/${threadId}/comments", $initialParams);
 			$i = 0;
 			$newCount = 0;
 			while ($request instanceof FacebookRequest && $i++ < 600)
