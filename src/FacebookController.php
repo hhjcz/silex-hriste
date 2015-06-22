@@ -102,14 +102,6 @@ class FacebookController {
 		));
 	}
 
-	public function zkouska(Request $request, Application $app)
-	{
-		$fbClient = new FacebookApiClient($app);
-		$sql = "INSERT INTO Messages VALUES (1, 2, 3, 'Honza', 'Zprava', 0)";
-		$app['db']->exec($sql);
-		return;
-	}
-
 	private function getPaging(Request $request)
 	{
 		$paging['since'] = $request->query->get('since') ?: null;
