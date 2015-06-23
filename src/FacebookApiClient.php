@@ -231,7 +231,8 @@ class FacebookApiClient {
 		{
 			$since = $this->getLatestPersistedMessage($threadId);
 			$initialParams['limit'] = $limit;
-			if ($since > 0) {
+			if ($since > 0)
+			{
 				$initialParams['since'] = $since;
 				$initialParams['__previous'] = 1;
 			}
@@ -254,13 +255,13 @@ class FacebookApiClient {
 				usleep(700000);
 			}
 
-			$totalCount = $this->getPersistedMessagesCount($threadId);
+			$count = $this->getPersistedMessagesCount($threadId);
 		} catch (FacebookRequestException $e)
 		{
 			throw $e;
 		}
 
-		return ['totalCount' => $totalCount, 'newCount' => $newCount];
+		return ['totalCount' => $count['totalCount'], 'newCount' => $newCount, 'wordsCount' => $count['wordsCount'], 'charsCount' => $count['charsCount']];
 
 	}
 
@@ -454,9 +455,14 @@ class FacebookApiClient {
 	{
 		/** @var Connection $db */
 		$db = $this->app['db'];
-		$sql = "SELECT COUNT(*) AS pocet FROM Messages WHERE thread_id = $threadId";
+		$sql = "SELECT COUNT(*) AS totalCount, SUM(LENGTH(text)) AS charsCount , SUM(LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) AS wordsCount
+				FROM Messages WHERE thread_id = $threadId";
 		$result = $db->fetchAssoc($sql);
 
-		return $result['pocet'];
+		return [
+			'totalCount' => $result['totalCount'],
+			'wordsCount' => $result['wordsCount'],
+			'charsCount' => $result['charsCount'],
+		];
 	}
 }

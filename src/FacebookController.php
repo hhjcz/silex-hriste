@@ -99,6 +99,8 @@ class FacebookController {
 			'threadId'  => $threadId,
 			'totalCount' => $messageCount['totalCount'],
 			'newCount'   => $messageCount['newCount'],
+			'wordsCount'   => $messageCount['wordsCount'],
+			'charsCount'   => $messageCount['charsCount'],
 		));
 	}
 

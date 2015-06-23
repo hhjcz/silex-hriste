@@ -6,8 +6,10 @@
 
     <div class="row" xmlns="http://www.w3.org/1999/html">
         <div class="small-12 columns">
-            <a href="/facebook/thread/{{ threadId }}" id="countBtn" class="button sucess large">{{ totalCount }} total</a>
-            <span href="#" id="countBtn" class="button sucess large">{{ newCount }} newly persisted</span>
+            <a href="/facebook/thread/{{ threadId }}" id="countBtn" class="button success large">{{ totalCount }} messages ({{ newCount }} new)</a>
+            {#<span href="#" id="countBtn" class="button success large">{{ newCount }} newly persisted</span>#}
+            <span href="#" id="countBtn" class="button success large">{{ wordsCount }} words </span>
+            <span href="#" id="countBtn" class="button success large">{{ charsCount }} characters </span>
             {#<a href="#" id="reloadBtn" class="button warning tiny">Reload</a>#}
             {#<a href="/facebook/thread/count/{{ thread.id }}" id="countBtn" class="button summary tiny">Count</a>#}
         </div>
