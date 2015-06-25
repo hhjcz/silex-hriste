@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -12,11 +13,33 @@ $app->get('/', function () use ($app)
 })
 	->bind('homepage');
 
-$app->get('/facebook/thread/count/{threadId}', 'FacebookController::countThread');
+// facebook login middleware:
+$facebookLogin = function (Request $request, Silex\Application $app)
+{
+	session_start();
+	/** @var FacebookApiClient $fbClient */
+	//$fbClient = new FacebookApiClient($app);
+	//$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
+	$fbClient = $app['facebook_api_client'];
+	if ($fbClient->session())
+	{
+		return;
+	} else
+	{
+		return new RedirectResponse('/facebook/login');
+	}
+};
 
-$app->get('/facebook/thread/{threadId}', 'FacebookController::showThread');
+$app->get('/facebook/login', 'FacebookController::login');
 
-$app->get('/facebook', 'FacebookController::showInbox');
+$app->get('/facebook/thread/count/{threadId}', 'FacebookController::countThread')->before($facebookLogin);
+
+$app->get('/facebook/thread/{threadId}', 'FacebookController::showThread')->before($facebookLogin);
+
+$app->get('/facebook', 'FacebookController::showInbox')->before($facebookLogin);
+
+
+/* ORIS */
 
 $app->get('/oris/calendar.ics', function (Request $request) use ($app)
 {

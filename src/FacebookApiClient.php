@@ -102,6 +102,25 @@ class FacebookApiClient {
 	}
 
 	/**
+	 * @return FacebookSession
+	 */
+	public function session()
+	{
+		return $this->session;
+	}
+
+	/**
+	 * @return string
+	 * @throws \Facebook\FacebookSDKException
+	 */
+	public function getLogoutUrl()
+	{
+		$logoutUrl = $this->fbHelper->getLogoutUrl($this->session, $this->app['fb_redirect_login_url'] . '?logout');
+
+		return $logoutUrl;
+	}
+
+	/**
 	 * @param string $userId
 	 * @return GraphUser
 	 * @throws FacebookRequestException
@@ -261,7 +280,12 @@ class FacebookApiClient {
 			throw $e;
 		}
 
-		return ['totalCount' => $count['totalCount'], 'newCount' => $newCount, 'wordsCount' => $count['wordsCount'], 'charsCount' => $count['charsCount']];
+		return [
+			'totalCount' => $count['totalCount'],
+			'newCount'   => $newCount,
+			'wordsCount' => $count['wordsCount'],
+			'charsCount' => $count['charsCount']
+		];
 
 	}
 

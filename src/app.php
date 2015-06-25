@@ -32,4 +32,11 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 	),
 ));
 
+$app['facebook_api_client'] = function ($app) {
+	$fbClient = new FacebookApiClient($app);
+	$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
+
+	return $fbClient;
+};
+
 return $app;

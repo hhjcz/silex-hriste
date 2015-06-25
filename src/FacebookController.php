@@ -11,25 +11,13 @@ class FacebookController {
 
 	public function showInbox(Request $request, Application $app)
 	{
-		// TODO - refactor as login() function of better route filter (if silex supports it)
-		session_start();
-		$fbClient = new FacebookApiClient($app);
-		$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
-		if ($fbSession)
-		{
-			$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, $app['fb_redirect_login_url'] . '?logout');
-		} else
-		{
-			$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
-			return $app['twig']->render('facebook-login.twig', array(
-				'loginUrl' => $loginUrl,
-			));
-		}
+		$fbClient = $app['facebook_api_client'];
 
 		$me = $fbClient->getUserInfo();
 		$fbUsername = $me->getName();
 		$fbId = $me->getId();
 		$messages = $fbClient->getMessages($limit = 5);
+		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook.twig', array(
 			'userLoggedIn'    => true,
@@ -44,28 +32,15 @@ class FacebookController {
 
 	public function showThread(Request $request, Application $app, $threadId)
 	{
-		session_start();
-		$fbClient = new FacebookApiClient($app);
-		$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
-		if ($fbSession)
-		{
-			$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, $app['fb_redirect_login_url'] . '?logout');
-		} else
-		{
-			$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
-			return $app['twig']->render('facebook-login.twig', array(
-				'loginUrl' => $loginUrl,
-			));
-		}
+		$fbClient = $app['facebook_api_client'];
 
-		//dump($request);
-		$paging = $this->getPaging($request);
+		$paging = $this->parsePaging($request);
 
 		$me = $fbClient->getUserInfo();
 		$thread = $fbClient->getThread($threadId, $paging);
-		//dump($thread);
 		$fbUsername = $me->getName();
 		$fbId = $me->getId();
+		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook-thread.twig', array(
 			'logoutUrl'       => $logoutUrl,
@@ -78,33 +53,22 @@ class FacebookController {
 
 	public function countThread(Request $request, Application $app, $threadId)
 	{
-		session_start();
-		$fbClient = new FacebookApiClient($app);
-		$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
-		if ($fbSession)
-		{
-			$logoutUrl = $fbClient->fbHelper()->getLogoutUrl($fbSession, $app['fb_redirect_login_url'] . '?logout');
-		} else
-		{
-			$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
-			return $app['twig']->render('facebook-login.twig', array(
-				'loginUrl' => $loginUrl,
-			));
-		}
+		$fbClient = $app['facebook_api_client'];
 
 		$messageCount = $fbClient->countThread($threadId);
+		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook-thread-count.twig', array(
-			'logoutUrl' => $logoutUrl,
-			'threadId'  => $threadId,
+			'logoutUrl'  => $logoutUrl,
+			'threadId'   => $threadId,
 			'totalCount' => $messageCount['totalCount'],
 			'newCount'   => $messageCount['newCount'],
-			'wordsCount'   => $messageCount['wordsCount'],
-			'charsCount'   => $messageCount['charsCount'],
+			'wordsCount' => $messageCount['wordsCount'],
+			'charsCount' => $messageCount['charsCount'],
 		));
 	}
 
-	private function getPaging(Request $request)
+	private function parsePaging(Request $request)
 	{
 		$paging['since'] = $request->query->get('since') ?: null;
 		$paging['until'] = $request->query->get('until') ?: null;
@@ -113,5 +77,23 @@ class FacebookController {
 		$paging['__paging_token'] = $request->query->get('__paging_token') ?: null;
 
 		return $paging;
+	}
+
+	/**
+	 * @param Application $app
+	 * @return FacebookApiClient
+	 * @throws Exception
+	 * @throws \Facebook\FacebookRequestException
+	 * @throws \Facebook\FacebookSDKException
+	 */
+	public function login(Application $app)
+	{
+		session_start();
+		$fbClient = $app['facebook_api_client'];
+		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
+
+		return $app['twig']->render('facebook-login.twig', array(
+			'loginUrl' => $loginUrl,
+		));
 	}
 }
