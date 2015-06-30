@@ -12,19 +12,19 @@
     </div>
 </div>
 <div class="row">
-    <div class="small-12 columns small-text"> Threads: {{ messages.unread }} unread, {{ messages.unseen }}
-        unseen </span>
-    </div>
+    {#<div class="small-12 columns small-text"> Threads: {{ inbox.unread }} unread, {{ inbox.unseen }}#}
+        {#unseen </span>#}
+    {#</div>#}
 
     <div class="row">
         <div class="small-12 columns small-text">
             <ul class="no-bullet">
-                {% for thread in messages.threads %}
+                {% for thread in inbox.threads %}
                     <hr>
                     <li>
                         <a href="/facebook/thread/{{ thread.id }}">
                             <span class="label info">{{ thread.users }}:</span>
-                            <span class="small-text"> unread: {{ thread.unread }} , unseen: {{ thread.unseen }}</span>
+                            <span class="small-text"> unread: {{ thread.unread }}, total: {{ thread.count }} </span>
                         </a>
                         <ul class="no-bullet">
                             {% for message in thread.messages %}

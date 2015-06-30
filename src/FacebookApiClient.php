@@ -171,14 +171,11 @@ class FacebookApiClient {
 	{
 		try
 		{
-			$request = new FacebookRequest($this->session, 'GET', '/me/inbox', ['limit' => $limit]);
+			$request = new FacebookRequest($this->session, 'GET', '/me/threads', ['limit' => $limit]);
 			$response = $request->execute();
 			$inboxGraph = $response->getGraphObject();
 			//dump($inboxGraph);
 			$inbox = new stdClass();
-			$inbox->summary = $inboxGraph->getProperty('summary');
-			$inbox->unseen = $inbox->summary->getProperty('unseen_count');
-			$inbox->unread = $inbox->summary->getProperty('unread_count');
 			$inbox->threads = $this->extractThreadsFromInboxGraph($inboxGraph);
 		} catch (FacebookRequestException $e)
 		{
@@ -206,14 +203,13 @@ class FacebookApiClient {
 			$threadGraph = $response->getGraphObject();
 			//dump($threadGraph);
 			$thread = new stdClass();
-			//$thread->summary = $threadGraph->getProperty('summary');
 			$thread->id = $threadGraph->getProperty('id');
 			$thread->users = $this->extractUsersFromThreadGraph($threadGraph, $thread);
-			$thread->unseen = $threadGraph->getProperty('unseen');
-			$thread->unread = $threadGraph->getProperty('unread');
+			$thread->unread = $threadGraph->getProperty('unread_count');
+			$thread->count = $threadGraph->getProperty('message_count');
 
 			$request = new FacebookRequest($this->session,
-				'GET', "/${threadId}/comments", [
+				'GET', "/${threadId}/messages", [
 					'since'          => $paging['since'],
 					'until'          => $paging['until'],
 					'__previous'     => $paging['__previous'],
@@ -222,12 +218,13 @@ class FacebookApiClient {
 				]);
 			$response = $request->execute();
 			$messagesInThreadGraph = $response->getGraphObject();
-			//dump($threadGraph);
+
 			$paging = $this->extractPagingFromResponse($response);
 			$thread->previousPage = $paging['previous'];
 			$thread->nextPage = $paging['next'];
 
-			$thread->messages = $this->extractMessagesFromThreadGraph($messagesInThreadGraph, $thread->unread);
+			$thread->messages = $this->extractMessagesFromThreadGraph($messagesInThreadGraph);
+			$thread->displayed = sizeof($thread->messages);
 		} catch (FacebookRequestException $e)
 		{
 			throw $e;
@@ -237,53 +234,31 @@ class FacebookApiClient {
 	}
 
 	/**
-	 * @param int $threadId
 	 * @param int $messageId
 	 * @return GraphObject
 	 * @throws Exception
 	 * @throws FacebookRequestException
 	 */
-	public function getMessage($threadId, $messageId)
+	public function getMessage($messageId)
 	{
 		try
 		{
-			dump("${threadId}_${messageId}");
-			$request = new FacebookRequest($this->session, 'GET', "/${threadId}_${messageId}");
-			dump($request);
+			//dump("${threadId}_${messageId}");
+			$request = new FacebookRequest($this->session, 'GET', "/${messageId}");
+			//dump($request);
 			$response = $request->execute();
-			$threadGraph = $response->getGraphObject();
-			dump($threadGraph);
-			//dump($threadGraph);
-			$thread = new stdClass();
-			//$thread->summary = $threadGraph->getProperty('summary');
-			$thread->id = $threadGraph->getProperty('id');
-			$thread->users = $this->extractUsersFromThreadGraph($threadGraph, $thread);
-			$thread->unseen = $threadGraph->getProperty('unseen');
-			$thread->unread = $threadGraph->getProperty('unread');
+			$messageGraph = $response->getGraphObject();
+			$message = $this->extractMessageFromMessageGraph($messageGraph);
 
-			$request = new FacebookRequest($this->session,
-				'GET', "/${threadId}/comments", [
-					'since'          => $paging['since'],
-					'until'          => $paging['until'],
-					'__previous'     => $paging['__previous'],
-					'limit'          => $limit,
-					'__paging_token' => $paging['__paging_token']
-				]);
-			$response = $request->execute();
-			$messagesInThreadGraph = $response->getGraphObject();
-			//dump($threadGraph);
-			$paging = $this->extractPagingFromResponse($response);
-			$thread->previousPage = $paging['previous'];
-			$thread->nextPage = $paging['next'];
-
-			$thread->messages = $this->extractMessagesFromThreadGraph($messagesInThreadGraph, $thread->unread);
+			return $message;
 		} catch (FacebookRequestException $e)
 		{
 			throw $e;
 		}
 
-		return $thread;
+		return $message;
 	}
+
 	/**
 	 * @param int $threadId
 	 * @param int $limit
@@ -384,13 +359,15 @@ class FacebookApiClient {
 		foreach ($inboxGraph->getPropertyAsArray('data') as $threadGraph)
 		{
 			$thread['id'] = $threadGraph->getProperty('id');
-			$thread['unseen'] = $threadGraph->getProperty('unseen');
-			$thread['unread'] = $threadGraph->getProperty('unread');
+			//$thread['unseen'] = $threadGraph->getProperty('unseen');
+			$thread['count'] = $threadGraph->getProperty('message_count');
+			$thread['unread'] = $threadGraph->getProperty('unread_count') ?: 0;
 
 			$thread['users'] = $this->extractUsersFromThreadGraph($threadGraph, $thread);
 
-			$messagesInThreadGraph = $threadGraph->getProperty('comments');
-			$thread['messages'] = $this->extractMessagesFromThreadGraph($messagesInThreadGraph, $thread['unread']);
+			$messagesInThreadGraph = $threadGraph->getProperty('messages');
+			//dump($messagesInThreadGraph);
+			$thread['messages'] = $this->extractMessagesFromThreadGraph($messagesInThreadGraph);
 			$threads[] = $thread;
 		}
 
@@ -401,16 +378,18 @@ class FacebookApiClient {
 	 * @param $threadGraph
 	 * @return mixed
 	 */
-	private function extractUsersFromThreadGraph($threadGraph)
+	private function extractUsersFromThreadGraph(GraphObject $threadGraph)
 	{
 		$threadUsers = '';
-		$usersGraph = $threadGraph->getProperty('to');
+		//dump($threadGraph);
+		$usersGraph = $threadGraph->getProperty('senders');//->getProperty('data');
 		//foreach ($usersGraph as $userGraph)
 		//{
 		//	$threadUsers .= $userGraph->getProperty('name') . ', ';
 		//}
 		//$threadUsers .= $usersGraph->getProperty('0') ? $usersGraph->getProperty('0')->getProperty('name') : '';
 		$separator = '';
+		//dump($usersGraph);
 		foreach (range(0, 30) as $key)
 		{
 			if ( ! $usersGraph->getProperty('' . $key)) continue;
@@ -421,43 +400,27 @@ class FacebookApiClient {
 			$threadUsers .= $separator . $threadUser;
 			$separator = ', ';
 		}
-
 		return $threadUsers;
 	}
 
 	/**
 	 * @param GraphObject $messagesInThreadGraph
-	 * @param int $unread
 	 * @return array
 	 */
-	private function extractMessagesFromThreadGraph($messagesInThreadGraph, $unread)
+	private function extractMessagesFromThreadGraph(GraphObject $messagesInThreadGraph)
 	{
-		if ($messagesInThreadGraph instanceof GraphObject) $messagesInThreadGraph = $messagesInThreadGraph->getPropertyAsArray('data');
-		else return [];
+		//dump($messagesInThreadGraph);
+		if ($messagesInThreadGraph instanceof GraphObject)
+			$messagesInThreadGraph = $messagesInThreadGraph->getPropertyAsArray('data');
+		else
+			return [];
+
 		$messagesInThread = [];
-		$i = 0;
 		foreach ($messagesInThreadGraph as $messageInThreadGraph)
 		{
-			//dump($messageInThreadGraph);
-			$messageId = $messageInThreadGraph->getProperty('id');
-			list($nic, $messageInThread['id']) = preg_split('/\_/', $messageId);
+			$messageInThread = $this->extractMessageFromMessageGraph($messageInThreadGraph);
 
-			//dump($messageId);
-			//dump((new FacebookRequest($this->session, 'GET', "/$messageId"))->execute());
-
-			$messageInThread['from'] = $messageInThreadGraph->getProperty('from')->getProperty('name');
-			$messageInThread['from_id'] = $messageInThreadGraph->getProperty('from')->getProperty('id');
-			$messageInThread['created_time'] = $this->prettifyTimestamp('' . $messageInThreadGraph->getProperty('created_time'))
-				->formatLocalized('%a %d %b %H:%M');
-			$messageInThread['created_timestamp'] = $this->prettifyTimestamp('' . $messageInThreadGraph->getProperty('created_time'))
-				->timestamp;
-			$messageText = $messageInThreadGraph->getProperty('message');
-			$messageInThread['message'] = $this->htmlEncodeMessageString($messageText);
-			if ($i++ < sizeof($messagesInThreadGraph) - $unread)
-				$messageInThread['status'] = 'read';
-			else
-				$messageInThread['status'] = 'unread';
-			array_push($messagesInThread, $messageInThread);
+			array_unshift($messagesInThread, $messageInThread);
 		}
 
 		return $messagesInThread;
@@ -535,5 +498,94 @@ class FacebookApiClient {
 			'wordsCount' => $result['wordsCount'],
 			'charsCount' => $result['charsCount'],
 		];
+	}
+
+	/**
+	 * @param GraphObject $messageInThreadGraph
+	 * @return string
+	 */
+	private function extractMessageStatus(GraphObject $messageInThreadGraph)
+	{
+		$tags = $this->extractTagsFromMessage($messageInThreadGraph);
+		if (in_array('read', $tags)) return 'read';
+		else return 'unread';
+	}
+
+	/**
+	 * @param GraphObject $messageInThreadGraph
+	 * @return array
+	 */
+	private function extractTagsFromMessage(GraphObject $messageInThreadGraph)
+	{
+		$tagsGraph = $messageInThreadGraph->getProperty('tags');
+		$tags = [];
+		foreach (range(0, 30) as $key)
+		{
+			$tag = $tagsGraph->getProperty('' . $key);
+			if ($tag) $tags[] = $tag->getProperty('name');
+		}
+
+		return $tags;
+	}
+
+	/**
+	 * @param $messageGraph
+	 * @return mixed
+	 */
+	private function extractMessageFromMessageGraph($messageGraph)
+	{
+		//dump($messageInThreadGraph);
+		$message = [];
+		$messageId = $messageGraph->getProperty('id');
+		//list($nic, $messageInThread['id']) = preg_split('/\_/', $messageId);
+		$message['id'] = $messageId;
+
+		//dump($messageId);
+		//dump((new FacebookRequest($this->session, 'GET', "/$messageId"))->execute());
+
+		$message['from'] = $messageGraph->getProperty('from')->getProperty('name');
+		$message['from_id'] = $messageGraph->getProperty('from')->getProperty('id');
+		$message['from_email'] = $messageGraph->getProperty('from')->getProperty('email');
+		$message['created_time'] = $this->prettifyTimestamp('' . $messageGraph->getProperty('created_time'))
+			->formatLocalized('%a %d %b %H:%M');
+		$message['created_timestamp'] = $this->prettifyTimestamp('' . $messageGraph->getProperty('created_time'))
+			->timestamp;
+		$messageText = $messageGraph->getProperty('message');
+		$message['message'] = $this->htmlEncodeMessageString($messageText);
+		$message['status'] = $this->extractMessageStatus($messageGraph);
+		$message['attachments'] = $this->extractMessageAttachments($messageGraph);
+
+		return $message;
+	}
+
+	/**
+	 * @param GraphObject $messageInThreadGraph
+	 * @return array
+	 */
+	private function extractMessageAttachments(GraphObject $messageInThreadGraph)
+	{
+		//dump($messageInThreadGraph);
+		if ( ! $attachmentsGraph = $messageInThreadGraph->getProperty('attachments')) return [];
+		$attachments = [];
+		foreach (range(0, 10) as $key)
+		{
+			$attachmentGraph = $attachmentsGraph->getProperty('' . $key);
+			if ( ! $attachmentGraph) continue;
+			//dump($attachmentGraph);
+			$attachment = [];
+			$attachment['id'] = $attachmentGraph->getProperty('id');
+			$attachment['mime_type'] = $attachmentGraph->getProperty('mime_type');
+			$attachmentData = $attachmentGraph->getProperty('image_data');
+			if ($attachmentData)
+			{
+				$attachment['url'] = $attachmentData->getProperty('url');
+				$attachment['preview_url'] = $attachmentData->getProperty('preview_url');
+				$attachment['width'] = $attachmentData->getProperty('width');
+				$attachment['height'] = $attachmentData->getProperty('height');
+			}
+			$attachments[] = $attachment;
+		}
+
+		return $attachments;
 	}
 }

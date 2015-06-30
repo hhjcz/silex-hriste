@@ -17,7 +17,7 @@ class FacebookController {
 		$me = $fbClient->getUserInfo();
 		$fbUsername = $me->getName();
 		$fbId = $me->getId();
-		$messages = $fbClient->getInbox($limit = 5);
+		$inbox = $fbClient->getInbox($limit = 5);
 		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook.twig', array(
@@ -26,7 +26,7 @@ class FacebookController {
 			'fbUserName'      => $fbUsername,
 			'fbId'            => $fbId,
 			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
-			'messages'        => $messages
+			'inbox'        => $inbox
 		));
 
 	}
@@ -57,7 +57,7 @@ class FacebookController {
 		$fbClient = $app['facebook_api_client'];
 
 		$me = $fbClient->getUserInfo();
-		$thread = $fbClient->getMessage($threadId, $messageId);
+		$message = $fbClient->getMessage($messageId);
 		$fbUsername = $me->getName();
 		$fbId = $me->getId();
 		$logoutUrl = $fbClient->getLogoutUrl();
@@ -66,8 +66,7 @@ class FacebookController {
 			'logoutUrl'       => $logoutUrl,
 			'fbUserName'      => $fbUsername,
 			'fbId'            => $fbId,
-			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
-			'thread'          => $thread
+			'message'          => $message
 		));
 	}
 

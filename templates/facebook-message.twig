@@ -6,35 +6,30 @@
 
     <div class="row">
         <div class="small-12 columns">
-            <a href="#" id="showAllBtn" class="button sucess tiny">Show unread</a>
-            <a href="#" id="reloadBtn" class="button warning tiny">Reload</a>
-            <a href="/facebook/thread/count/{{ thread.id }}" id="countBtn" class="button summary tiny">Count</a>
+            {#<a href="#" id="showAllBtn" class="button sucess tiny">Show unread</a>#}
+            {#<a href="#" id="reloadBtn" class="button warning tiny">Reload</a>#}
+            {#<a href="/facebook/thread/count/{{ thread.id }}" id="countBtn" class="button summary tiny">Count</a>#}
         </div>
     </div>
 
 
     <div class="row">
         <div class="small-12 columns">
-            <ul class="no-bullet">
-                {#<li>#}
-                    {#<span class="">{{ thread.count }} total messages</span>#}
-                {#</li>#}
+{#            <ul class="no-bullet">
                 <li>
-                    <a href="/facebook/thread/{{ thread.id }}?until={{ thread.nextPage.until }}&since={{ thread.nextPage.since }}&__previous={{ thread.nextPage.__previous }}&limit={{ thread.nextPage.limit }}&__paging_token={{ thread.nextPage.__paging_token }}">
+                    <a href="/facebook/thread/{{ message.id }}?until={{ thread.nextPage.until }}&since={{ thread.nextPage.since }}&__previous={{ thread.nextPage.__previous }}&limit={{ thread.nextPage.limit }}&__paging_token={{ thread.nextPage.__paging_token }}">
                         previous
                     </a>
                 </li>
                 <li>
                     <span class="label info">{{ thread.users }}:</span>
-                    <span class="small-text"> unread: {{ thread.unread }}, displayed: {{ thread.displayed }}, total: {{ thread.count }}</span>
+                    <span class="small-text"> unread: {{ thread.unread }} , unseen: {{ thread.unseen }}</span>#}
                     <ul class="no-bullet">
-                        {% for message in thread.messages %}
-                            <li class="message-{{ message.status }}">
+                        {#{% for message in thread.messages %}#}
+                            <li class="message-unread">
                                 <span class="label secondary">{{ message.from }}</span>
                                 <span class="small-text">{{ message.created_time }}</span>
-                                <span class="small-text"><a
-                                            href="/facebook/thread/{{ thread.id }}/message/{{ message.id }}">#{{ message.id }}</a>
-                                </span>
+                                {#<span class="small-text"><a href="/facebook/thread/{{ thread.id }}/message/{{ message.id }}">#{{ message.id }}</a></span>#}
 
                                 {% if message.message|length > 0 %}
                                     <div class="message-text">{{ message.message | raw }}</div>
@@ -43,21 +38,21 @@
                                     {% for attachment in message.attachments %}
                                         <div>
                                             <a href="{{ attachment.url }}">
-                                                <img src="{{ attachment.preview_url }}" />
+                                                <img src="{{ attachment.url }}" />
                                             </a>
                                         </div>
                                     {% endfor %}
                                 {% endif %}
                             </li>
-                        {% endfor %}
+                        {#{% endfor %}#}
                     </ul>
-                </li>
+{#                </li>
                 <li>
                     <a href="/facebook/thread/{{ thread.id }}?until={{ thread.previousPage.until }}&since={{ thread.previousPage.since }}&__previous={{ thread.previousPage.__previous }}&limit={{ thread.previousPage.limit }}&__paging_token={{ thread.previousPage.__paging_token }}">
                         next
                     </a>
                 </li>
-            </ul>
+            </ul>#}
         </div>
     </div>
     <div class="row">
@@ -66,9 +61,9 @@
         </div>
     </div>
     {#<div class="row">#}
-    {#<div class="small-12 columns">#}
-    {#<a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>#}
-    {#</div>#}
+        {#<div class="small-12 columns">#}
+            {#<a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>#}
+        {#</div>#}
     {#</div>#}
 
     <script>
