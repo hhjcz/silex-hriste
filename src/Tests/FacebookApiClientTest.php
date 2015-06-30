@@ -2,6 +2,7 @@
 
 use App;
 use Mockery as m;
+use PHPUnit_Framework_TestCase;
 use TestCase;
 
 /**
@@ -10,9 +11,9 @@ use TestCase;
  */
 class FacebookApiClientTest extends \PHPUnit_Framework_TestCase {
 
-	const OBJECT_CLASS = 'FacebookApiClient';
+	const OBJECT_CLASS = 'Facebook\FacebookApiClient';
 
-	/** @var \FacebookApiClient */
+	/** @var \Facebook\FacebookApiClient */
 	protected $object;
 
 	public function setUp()
@@ -20,7 +21,7 @@ class FacebookApiClientTest extends \PHPUnit_Framework_TestCase {
 		parent::setUp();
 		// $this->object = m::mock(self::OBJECT_CLASS);
 		$className = self::OBJECT_CLASS;
-		$this->object = new $className;
+		$this->object = new $className();
 		//$this->object = App::make(self::OBJECT_CLASS);
 	}
 

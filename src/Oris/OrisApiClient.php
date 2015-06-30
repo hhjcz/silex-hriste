@@ -1,4 +1,6 @@
-<?php
+<?php namespace Oris;
+
+use GuzzleHttp;
 use GuzzleHttp\Client;
 
 /**

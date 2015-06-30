@@ -1,5 +1,6 @@
 <?php
 
+use Facebook\FacebookApiClient;
 use Facebook\FacebookPermissions;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,17 +15,19 @@ class FacebookController {
 	{
 		$fbClient = $app['facebook_api_client'];
 
-		$me = $fbClient->getUserInfo();
-		$fbUsername = $me->getName();
-		$fbId = $me->getId();
-		$inbox = $fbClient->getInbox($limit = 5);
+		$paging = $this->parsePaging($request, 5);
+
+		//$me = $fbClient->getUserInfo();
+		//$fbUsername = $me->getName();
+		//$fbId = $me->getId();
+		$inbox = $fbClient->getInbox($paging);
 		$logoutUrl = $fbClient->getLogoutUrl();
 
-		return $app['twig']->render('facebook.twig', array(
+		return $app['twig']->render('facebook-inbox.twig', array(
 			'userLoggedIn'    => true,
 			'logoutUrl'       => $logoutUrl,
-			'fbUserName'      => $fbUsername,
-			'fbId'            => $fbId,
+			//'fbUserName'      => $fbUsername,
+			//'fbId'            => $fbId,
 			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
 			'inbox'        => $inbox
 		));
@@ -35,18 +38,18 @@ class FacebookController {
 	{
 		$fbClient = $app['facebook_api_client'];
 
-		$paging = $this->parsePaging($request);
+		$paging = $this->parsePaging($request, 30);
 
-		$me = $fbClient->getUserInfo();
+		//$me = $fbClient->getUserInfo();
+		//$fbUsername = $me->getName();
+		//$fbId = $me->getId();
 		$thread = $fbClient->getThread($threadId, $paging);
-		$fbUsername = $me->getName();
-		$fbId = $me->getId();
 		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook-thread.twig', array(
 			'logoutUrl'       => $logoutUrl,
-			'fbUserName'      => $fbUsername,
-			'fbId'            => $fbId,
+			//'fbUserName'      => $fbUsername,
+			//'fbId'            => $fbId,
 			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
 			'thread'          => $thread
 		));
@@ -87,12 +90,12 @@ class FacebookController {
 		));
 	}
 
-	private function parsePaging(Request $request)
+	private function parsePaging(Request $request, $defaultLimit = 30)
 	{
 		$paging['since'] = $request->query->get('since') ?: null;
 		$paging['until'] = $request->query->get('until') ?: null;
 		$paging['__previous'] = $request->query->get('__previous') ?: null;
-		$paging['limit'] = $request->query->get('limit') ?: 30;
+		$paging['limit'] = $request->query->get('limit') ?: $defaultLimit;
 		$paging['__paging_token'] = $request->query->get('__paging_token') ?: null;
 
 		return $paging;

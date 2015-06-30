@@ -1,5 +1,7 @@
 <?php
 
+use Facebook\FacebookApiClient;
+use Oris\OrisApiClient;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +20,7 @@ $facebookLogin = function (Request $request, Silex\Application $app)
 {
 	session_start();
 	/** @var FacebookApiClient $fbClient */
-	//$fbClient = new FacebookApiClient($app);
+	//$fbClient = new Facebook\FacebookApiClient($app);
 	//$fbSession = $fbClient->authenticate($app['fb_api_key'], $app['fb_api_secret'], $app['fb_redirect_login_url']);
 	$fbClient = $app['facebook_api_client'];
 	if ($fbClient->session())
