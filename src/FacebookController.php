@@ -1,5 +1,6 @@
 <?php
 
+use Facebook\FacebookPermissions;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,7 +17,7 @@ class FacebookController {
 		$me = $fbClient->getUserInfo();
 		$fbUsername = $me->getName();
 		$fbId = $me->getId();
-		$messages = $fbClient->getMessages($limit = 5);
+		$messages = $fbClient->getInbox($limit = 5);
 		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook.twig', array(
@@ -43,6 +44,25 @@ class FacebookController {
 		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook-thread.twig', array(
+			'logoutUrl'       => $logoutUrl,
+			'fbUserName'      => $fbUsername,
+			'fbId'            => $fbId,
+			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
+			'thread'          => $thread
+		));
+	}
+
+	public function showMessage(Request $request, Application $app, $threadId, $messageId)
+	{
+		$fbClient = $app['facebook_api_client'];
+
+		$me = $fbClient->getUserInfo();
+		$thread = $fbClient->getMessage($threadId, $messageId);
+		$fbUsername = $me->getName();
+		$fbId = $me->getId();
+		$logoutUrl = $fbClient->getLogoutUrl();
+
+		return $app['twig']->render('facebook-message.twig', array(
 			'logoutUrl'       => $logoutUrl,
 			'fbUserName'      => $fbUsername,
 			'fbId'            => $fbId,
@@ -90,7 +110,11 @@ class FacebookController {
 	{
 		session_start();
 		$fbClient = $app['facebook_api_client'];
-		$loginUrl = $fbClient->fbHelper()->getLoginUrl(['manage_notifications', 'read_mailbox']);
+		$loginUrl = $fbClient->fbHelper()->getLoginUrl([
+			FacebookPermissions::MANAGE_NOTIFICATIONS,
+			FacebookPermissions::READ_MAILBOX,
+			//FacebookPermissions::PUBLISH_ACTIONS,
+		]);
 
 		return $app['twig']->render('facebook-login.twig', array(
 			'loginUrl' => $loginUrl,

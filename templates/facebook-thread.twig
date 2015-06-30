@@ -29,7 +29,7 @@
                             <li class="message-{{ message.status }}">
                                 <span class="label secondary">{{ message.from }}</span>
                                 <span class="small-text">{{ message.created_time }}</span>
-                                <span class="small-text"> #{{ message.id }}</span>
+                                <span class="small-text"><a href="/facebook/thread/{{ thread.id }}/message/{{ message.id }}">#{{ message.id }}</a></span>
 
                                 <div class="message-text">{{ message.message | raw }}</div>
                             </li>

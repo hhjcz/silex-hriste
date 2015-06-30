@@ -167,11 +167,10 @@ class FacebookApiClient {
 	 * @throws Exception
 	 * @throws FacebookRequestException
 	 */
-	public function getMessages($limit = 5)
+	public function getInbox($limit = 5)
 	{
 		try
 		{
-			//$request = new FacebookRequest($this->session, 'GET', '/390523424453383/comments', ['limit' => $limit]);
 			$request = new FacebookRequest($this->session, 'GET', '/me/inbox', ['limit' => $limit]);
 			$response = $request->execute();
 			$inboxGraph = $response->getGraphObject();
@@ -237,6 +236,54 @@ class FacebookApiClient {
 		return $thread;
 	}
 
+	/**
+	 * @param int $threadId
+	 * @param int $messageId
+	 * @return GraphObject
+	 * @throws Exception
+	 * @throws FacebookRequestException
+	 */
+	public function getMessage($threadId, $messageId)
+	{
+		try
+		{
+			dump("${threadId}_${messageId}");
+			$request = new FacebookRequest($this->session, 'GET', "/${threadId}_${messageId}");
+			dump($request);
+			$response = $request->execute();
+			$threadGraph = $response->getGraphObject();
+			dump($threadGraph);
+			//dump($threadGraph);
+			$thread = new stdClass();
+			//$thread->summary = $threadGraph->getProperty('summary');
+			$thread->id = $threadGraph->getProperty('id');
+			$thread->users = $this->extractUsersFromThreadGraph($threadGraph, $thread);
+			$thread->unseen = $threadGraph->getProperty('unseen');
+			$thread->unread = $threadGraph->getProperty('unread');
+
+			$request = new FacebookRequest($this->session,
+				'GET', "/${threadId}/comments", [
+					'since'          => $paging['since'],
+					'until'          => $paging['until'],
+					'__previous'     => $paging['__previous'],
+					'limit'          => $limit,
+					'__paging_token' => $paging['__paging_token']
+				]);
+			$response = $request->execute();
+			$messagesInThreadGraph = $response->getGraphObject();
+			//dump($threadGraph);
+			$paging = $this->extractPagingFromResponse($response);
+			$thread->previousPage = $paging['previous'];
+			$thread->nextPage = $paging['next'];
+
+			$thread->messages = $this->extractMessagesFromThreadGraph($messagesInThreadGraph, $thread->unread);
+		} catch (FacebookRequestException $e)
+		{
+			throw $e;
+		}
+
+		return $thread;
+	}
 	/**
 	 * @param int $threadId
 	 * @param int $limit

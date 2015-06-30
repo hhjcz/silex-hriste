@@ -34,7 +34,10 @@ $app->get('/facebook/login', 'FacebookController::login');
 
 $app->get('/facebook/thread/count/{threadId}', 'FacebookController::countThread')->before($facebookLogin);
 
+$app->get('/facebook/thread/{threadId}/message/{messageId}', 'FacebookController::showMessage')->before($facebookLogin);
+
 $app->get('/facebook/thread/{threadId}', 'FacebookController::showThread')->before($facebookLogin);
+
 
 $app->get('/facebook', 'FacebookController::showInbox')->before($facebookLogin);
 
