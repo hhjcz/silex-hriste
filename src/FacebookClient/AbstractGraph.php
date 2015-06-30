@@ -1,4 +1,6 @@
-<?php namespace Facebook;
+<?php namespace FacebookClient;
+
+use Facebook\GraphObject;
 
 /**
  *

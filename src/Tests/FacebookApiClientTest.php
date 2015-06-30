@@ -1,6 +1,7 @@
 <?php namespace Tests;
 
 use App;
+use FacebookClient\FacebookApiClient;
 use Mockery as m;
 use PHPUnit_Framework_TestCase;
 use TestCase;
@@ -11,7 +12,7 @@ use TestCase;
  */
 class FacebookApiClientTest extends \PHPUnit_Framework_TestCase {
 
-	const OBJECT_CLASS = 'Facebook\FacebookApiClient';
+	const OBJECT_CLASS = FacebookApiClient::class;
 
 	/** @var \Facebook\FacebookApiClient */
 	protected $object;

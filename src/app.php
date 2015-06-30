@@ -1,6 +1,6 @@
 <?php
 
-use Facebook\FacebookApiClient;
+use FacebookClient\FacebookApiClient;
 use Silex\Application;
 use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\RoutingServiceProvider;

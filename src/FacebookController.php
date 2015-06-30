@@ -1,7 +1,5 @@
 <?php
 
-use Facebook\FacebookApiClient;
-use Facebook\FacebookPermissions;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 

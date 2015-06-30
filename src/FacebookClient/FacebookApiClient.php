@@ -1,7 +1,12 @@
-<?php namespace Facebook;
+<?php namespace FacebookClient;
 
 use Doctrine\DBAL\Connection;
 use Exception;
+use Facebook\FacebookRedirectLoginHelper;
+use Facebook\FacebookRequest;
+use Facebook\FacebookRequestException;
+use Facebook\FacebookResponse;
+use Facebook\FacebookSession;
 use Silex\Application;
 use Silex\Application\MonologTrait;
 
@@ -200,17 +205,9 @@ class FacebookApiClient {
 			$threadGraph = new ThreadGraph($request->execute()->getGraphObject());
 			$thread = $threadGraph->extractThread();
 
-			$request = new FacebookRequest($this->session,
-				'GET', "/${threadId}/messages", $paging);//[
-			//'since'          => $paging['since'],
-			//'until'          => $paging['until'],
-			//'__previous'     => $paging['__previous'],
-			//'limit'          => $limit,
-			//'__paging_token' => $paging['__paging_token']
-			//]);
+			$request = new FacebookRequest($this->session, 'GET', "/${threadId}/messages", $paging);
 			$response = $request->execute();
 			$messagesGraph = new MessagesGraph($response->getGraphObject());
-
 			$thread->messages = $messagesGraph->extractMessages();
 			$thread->displayed = sizeof($thread->messages);
 
@@ -222,7 +219,6 @@ class FacebookApiClient {
 		{
 			throw $e;
 		}
-
 		return $thread;
 	}
 

@@ -1,4 +1,4 @@
-<?php namespace Facebook;
+<?php namespace FacebookClient;
 
 /**
  *
