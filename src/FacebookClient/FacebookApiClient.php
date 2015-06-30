@@ -142,25 +142,6 @@ class FacebookApiClient {
 	}
 
 	/**
-	 * @return GraphObject
-	 * @throws FacebookRequestException
-	 */
-	public function getNotifications()
-	{
-		try
-		{
-			$request = new FacebookRequest($this->session, 'GET', '/me/notifications');
-			$response = $request->execute();
-			$graphObject = $response->getGraphObject();
-		} catch (FacebookRequestException $e)
-		{
-			throw $e;
-		}
-
-		return $graphObject;
-	}
-
-	/**
 	 * @param array $paging
 	 * @return GraphObject
 	 * @throws Exception
@@ -293,6 +274,38 @@ class FacebookApiClient {
 			'charsCount' => $count['charsCount']
 		];
 
+	}
+
+	/**
+	 * @param array $paging
+	 * @return GraphObject
+	 * @throws Exception
+	 * @throws FacebookRequestException
+	 */
+	public function getNotifications($paging)
+	{
+		$paging['limit'] = $paging['limit'] ?: 30;
+		try
+		{
+			$request = new FacebookRequest($this->session, 'GET', '/me/notifications', $paging);
+			$response = $request->execute();
+			$notificationsGraph = new NotificationsGraph($response->getGraphObject());
+
+			$notifications = new \stdClass();
+			$notifications->items = $notificationsGraph->extractNotifications();
+
+			$paging = $this->extractPagingFromResponse($response);
+			$notifications->previousPage = $paging['previous'];
+			$notifications->nextPage = $paging['next'];
+
+			//dump($notifications);
+
+		} catch (FacebookRequestException $e)
+		{
+			throw $e;
+		}
+
+		return $notifications;
 	}
 
 	/**

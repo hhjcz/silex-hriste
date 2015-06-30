@@ -22,7 +22,7 @@ class FacebookController {
 		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook-inbox.twig', array(
-			'userLoggedIn'    => true,
+			//'userLoggedIn'    => true,
 			'logoutUrl'       => $logoutUrl,
 			//'fbUserName'      => $fbUsername,
 			//'fbId'            => $fbId,
@@ -85,6 +85,21 @@ class FacebookController {
 			'newCount'   => $messageCount['newCount'],
 			'wordsCount' => $messageCount['wordsCount'],
 			'charsCount' => $messageCount['charsCount'],
+		));
+	}
+
+	public function showNotifications(Request $request, Application $app)
+	{
+		$fbClient = $app['facebook_api_client'];
+
+		$paging = $this->parsePaging($request, 30);
+		$notifications = $fbClient->getNotifications($paging);
+
+		$logoutUrl = $fbClient->getLogoutUrl();
+
+		return $app['twig']->render('facebook-notifications.twig', array(
+			'logoutUrl'  => $logoutUrl,
+			'notifications' => $notifications,
 		));
 	}
 

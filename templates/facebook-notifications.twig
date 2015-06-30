@@ -1,0 +1,65 @@
+{% extends "bodylayout.twig" %}
+
+{% block title %}silex-hriste{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="small-12 columns">
+            {#<a href="#" id="showAllBtn" class="button sucess tiny">Show all</a>#}
+            <a href="#" id="reloadBtn" class="button warning tiny">Reload</a>
+        </div>
+    </div>
+    <div class="row">
+        {#<div class="small-12 columns small-text"> Threads: {{ inbox.unread }} unread, {{ inbox.unseen }}#}
+        {#unseen </span>#}
+        {#</div>#}
+
+        <div class="row">
+            <div class="small-12 columns small-text">
+                <ul class="no-bullet">
+                    {#<li>#}
+                        {#<a href="/facebook?until={{ inbox.previousPage.until }}&since={{ inbox.previousPage.since }}&__previous={{ inbox.previousPage.__previous }}&limit={{ inbox.previousPage.limit }}&__paging_token={{ inbox.previousPage.__paging_token }}">#}
+                        {#previous#}
+                        {#</a>#}
+                    {#</li>#}
+                    {% for notification in notifications.items %}
+                        <li>
+                            {#<a href="/facebook/notification/{{ notification.id }}">#}
+                            <span class="label info">{{ notification.object }}{{ notification.from }}:</span>
+                            {#</a>#}
+                            <ul class="no-bullet">
+                                {#{% for message in notification.messages %}#}
+                                    <li class="message-unread">
+                                        <span class="label secondary">{{ notification.created_time }}:</span>
+                                        <span class="small-text">{{ notification.title }}:</span>
+
+                                        {#<div class="message-text">{{ message.message | raw }}</div>#}
+                                    </li>
+                                {#{% endfor %}#}
+                            </ul>
+                        </li>
+                        <hr>
+                    {% endfor %}
+                    {#<li>#}
+                        {#<a href="/facebook?until={{ inbox.nextPage.until }}&since={{ inbox.nextPage.since }}&__previous={{ inbox.nextPage.__previous }}&limit={{ inbox.nextPage.limit }}&__paging_token={{ inbox.nextPage.__paging_token }}">#}
+                            {#next#}
+                        {#</a>#}
+                    {#</li>#}
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="small-12 columns">
+                {#Logged in as: {{ fbUserName }}, id: {{ fbId }}#}
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 columns">
+                <a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

@@ -39,6 +39,7 @@ $app->get('/facebook/thread/{threadId}/message/{messageId}', 'FacebookController
 
 $app->get('/facebook/thread/{threadId}', 'FacebookController::showThread')->before($facebookLogin);
 
+$app->get('/facebook/notifications', 'FacebookController::showNotifications')->before($facebookLogin);
 
 $app->get('/facebook', 'FacebookController::showInbox')->before($facebookLogin);
 

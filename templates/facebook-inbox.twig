@@ -4,64 +4,63 @@
 
 {% block content %}
 
-    {% if userLoggedIn == true %}
-<div class="row">
-    <div class="small-12 columns">
-        <a href="#" id="showAllBtn" class="button sucess tiny">Show all</a>
-        <a href="#" id="reloadBtn" class="button warning tiny">Reload</a>
-    </div>
-</div>
-<div class="row">
-    {#<div class="small-12 columns small-text"> Threads: {{ inbox.unread }} unread, {{ inbox.unseen }}#}
-    {#unseen </span>#}
-    {#</div>#}
-
     <div class="row">
-        <div class="small-12 columns small-text">
-            <ul class="no-bullet">
-                <li>
-                    <a href="/facebook?until={{ inbox.previousPage.until }}&since={{ inbox.previousPage.since }}&__previous={{ inbox.previousPage.__previous }}&limit={{ inbox.previousPage.limit }}&__paging_token={{ inbox.previousPage.__paging_token }}">
-                        previous
-                    </a>
-                </li>
-                {% for thread in inbox.threads %}
+        <div class="small-12 columns">
+            <a href="#" id="showAllBtn" class="button sucess tiny">Show all</a>
+            <a href="#" id="reloadBtn" class="button warning tiny">Reload</a>
+        </div>
+    </div>
+    <div class="row">
+        {#<div class="small-12 columns small-text"> Threads: {{ inbox.unread }} unread, {{ inbox.unseen }}#}
+        {#unseen </span>#}
+        {#</div>#}
+
+        <div class="row">
+            <div class="small-12 columns small-text">
+                <ul class="no-bullet">
                     <li>
-                        <a href="/facebook/thread/{{ thread.id }}">
-                            <span class="label info">{{ thread.users }}:</span>
-                            <span class="small-text"> unread: {{ thread.unread }}, total: {{ thread.count }} </span>
+                        <a href="/facebook?until={{ inbox.previousPage.until }}&since={{ inbox.previousPage.since }}&__previous={{ inbox.previousPage.__previous }}&limit={{ inbox.previousPage.limit }}&__paging_token={{ inbox.previousPage.__paging_token }}">
+                            previous
                         </a>
-                        <ul class="no-bullet">
-                            {% for message in thread.messages %}
-                                <li class="message-{{ message.status }}">
-                                    <span class="label secondary">{{ message.from }}:</span>
-                                    <span class="small-text">{{ message.created_time }}:</span>
-
-                                    <div class="message-text">{{ message.message | raw }}</div>
-                                </li>
-                            {% endfor %}
-                        </ul>
                     </li>
-                    <hr>
-                {% endfor %}
-                <li>
-                    <a href="/facebook?until={{ inbox.nextPage.until }}&since={{ inbox.nextPage.since }}&__previous={{ inbox.nextPage.__previous }}&limit={{ inbox.nextPage.limit }}&__paging_token={{ inbox.nextPage.__paging_token }}">
-                        next
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+                    {% for thread in inbox.threads %}
+                        <li>
+                            <a href="/facebook/thread/{{ thread.id }}">
+                                <span class="label info">{{ thread.users }}:</span>
+                                <span class="small-text"> unread: {{ thread.unread }}, total: {{ thread.count }} </span>
+                            </a>
+                            <ul class="no-bullet">
+                                {% for message in thread.messages %}
+                                    <li class="message-{{ message.status }}">
+                                        <span class="label secondary">{{ message.from }}:</span>
+                                        <span class="small-text">{{ message.created_time }}:</span>
 
-    <div class="row">
-        <div class="small-12 columns">
-            {#Logged in as: {{ fbUserName }}, id: {{ fbId }}#}
+                                        <div class="message-text">{{ message.message | raw }}</div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <hr>
+                    {% endfor %}
+                    <li>
+                        <a href="/facebook?until={{ inbox.nextPage.until }}&since={{ inbox.nextPage.since }}&__previous={{ inbox.nextPage.__previous }}&limit={{ inbox.nextPage.limit }}&__paging_token={{ inbox.nextPage.__paging_token }}">
+                            next
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="small-12 columns">
-            <a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>
-        </div>
-    </div>
-    {% endif %}
 
-    {% endblock %}
+        <div class="row">
+            <div class="small-12 columns">
+                {#Logged in as: {{ fbUserName }}, id: {{ fbId }}#}
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 columns">
+                <a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

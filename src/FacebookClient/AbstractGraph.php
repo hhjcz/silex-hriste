@@ -20,4 +20,13 @@ class AbstractGraph {
 		$this->graph = $graph;
 	}
 
+	/**
+	 * @param string $propertyName
+	 * @param string $type
+	 * @return mixed
+	 */
+	protected function getProperty($propertyName, $type = 'Facebook\GraphObject')
+	{
+		return $this->graph->getProperty($propertyName, $type);
+	}
 }
