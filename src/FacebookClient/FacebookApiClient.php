@@ -7,6 +7,7 @@ use Facebook\FacebookRequest;
 use Facebook\FacebookRequestException;
 use Facebook\FacebookResponse;
 use Facebook\FacebookSession;
+use Facebook\GraphUser;
 use Silex\Application;
 use Silex\Application\MonologTrait;
 

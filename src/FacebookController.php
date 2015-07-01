@@ -58,16 +58,16 @@ class FacebookController {
 	{
 		$fbClient = $app['facebook_api_client'];
 
-		$me = $fbClient->getUserInfo();
+		//$me = $fbClient->getUserInfo();
+		//$fbUsername = $me->getName();
+		//$fbId = $me->getId();
 		$message = $fbClient->getMessage($messageId);
-		$fbUsername = $me->getName();
-		$fbId = $me->getId();
 		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook-message.twig', array(
 			'logoutUrl'       => $logoutUrl,
-			'fbUserName'      => $fbUsername,
-			'fbId'            => $fbId,
+			//'fbUserName'      => $fbUsername,
+			//'fbId'            => $fbId,
 			'message'          => $message
 		));
 	}
