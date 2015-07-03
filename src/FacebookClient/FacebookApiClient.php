@@ -236,14 +236,8 @@ class FacebookApiClient {
 	{
 		try
 		{
-			$since = $this->extractPlainMessageId($this->getLatestPersistedMessage($threadId));
+			//$since = $this->extractPlainMessageId($this->getLatestPersistedMessage($threadId));
 			$initialParams['limit'] = $limit;
-			//if (false && $since > 0)
-			//{
-			//	$initialParams['since'] = $since;
-			//	$initialParams['__previous'] = 1;
-			//}
-			//dump($initialParams);
 			$request = new FacebookRequest($this->session, 'GET', "/${threadId}/messages", $initialParams);
 			$i = 0;
 			$newCount = 0;
@@ -252,17 +246,14 @@ class FacebookApiClient {
 				$response = $request->execute();
 				$messagesGraph = new MessagesGraph($response->getGraphObject());
 				$messages = $messagesGraph->extractMessages();
-				$exists = $this->persistMessages($threadId, $messages);
-				if ($exists) break;
+				$alreadyPersisted = $this->persistMessages($threadId, $messages);
 				$newCount += sizeof($messages);
 				$this->app['monolog']->addDebug(sprintf("Pocet zprav so far: %d.", $newCount));
+				// dosli jsme az ke zpravam, ktery uz mame ulozeny, koncime:
+				if ($alreadyPersisted) break;
 
-				/** @var FacebookRequest $request */
-				//if (false && $since > 0)
-				//	$request = $response->getRequestForPreviousPage();
-				//else
+				// predchozi (dalsi) stranka:
 				$request = $response->getRequestForNextPage();
-				//dump($request->getParameters());
 				//usleep(700000);
 			}
 
@@ -374,16 +365,12 @@ class FacebookApiClient {
 			$selectStmt->execute([$message['id']]);
 			$result = $selectStmt->fetch();
 			if (((int) array_shift($result)) > 0) $exists = true;
-			//dump($exists);
-			//continue;
 
 			$attachment_url = null;
 			if (sizeof($message['attachments']) > 0)
 			{
-				//dump($message['attachments']);
 				$attachment = array_shift($message['attachments']);
 				$attachment_url = $attachment['url'];
-				//dump($attachment_url);
 			}
 
 			$insertStmt->execute([
