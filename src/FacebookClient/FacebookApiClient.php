@@ -232,34 +232,38 @@ class FacebookApiClient {
 	 * @throws Exception
 	 * @throws FacebookRequestException
 	 */
-	public function countThread($threadId, $limit = 300)
+	public function countThread($threadId, $limit = 500)
 	{
 		try
 		{
-			$since = $this->getLatestPersistedMessage($threadId);
+			$since = $this->extractPlainMessageId($this->getLatestPersistedMessage($threadId));
 			$initialParams['limit'] = $limit;
-			if ($since > 0)
-			{
-				$initialParams['since'] = $since;
-				$initialParams['__previous'] = 1;
-			}
-			$request = new FacebookRequest($this->session, 'GET', "/${threadId}/comments", $initialParams);
+			//if (false && $since > 0)
+			//{
+			//	$initialParams['since'] = $since;
+			//	$initialParams['__previous'] = 1;
+			//}
+			//dump($initialParams);
+			$request = new FacebookRequest($this->session, 'GET', "/${threadId}/messages", $initialParams);
 			$i = 0;
 			$newCount = 0;
 			while ($request instanceof FacebookRequest && $i++ < 600)
 			{
 				$response = $request->execute();
-
-				$messages = $this->extractMessagesFromThreadGraph($response->getGraphObject(), 0);
-				$this->persistMessages($threadId, $messages);
+				$messagesGraph = new MessagesGraph($response->getGraphObject());
+				$messages = $messagesGraph->extractMessages();
+				$exists = $this->persistMessages($threadId, $messages);
+				if ($exists) break;
 				$newCount += sizeof($messages);
 				$this->app['monolog']->addDebug(sprintf("Pocet zprav so far: %d.", $newCount));
 
-				if ($since > 0)
-					$request = $response->getRequestForPreviousPage();
-				else
-					$request = $response->getRequestForNextPage();
-				usleep(700000);
+				/** @var FacebookRequest $request */
+				//if (false && $since > 0)
+				//	$request = $response->getRequestForPreviousPage();
+				//else
+				$request = $response->getRequestForNextPage();
+				//dump($request->getParameters());
+				//usleep(700000);
 			}
 
 			$count = $this->getPersistedMessagesCount($threadId);
@@ -350,40 +354,79 @@ class FacebookApiClient {
 	/**
 	 * @param string $threadId
 	 * @param array $messages
+	 * @return bool
 	 * @throws \Doctrine\DBAL\ConnectionException
 	 * @throws \Doctrine\DBAL\DBALException
 	 */
 	private function persistMessages($threadId, $messages)
 	{
+		$exists = false;
 		/** @var Connection $db */
 		$db = $this->app['db'];
-		$sql = 'INSERT OR IGNORE INTO Messages (id, thread_id, from_id, from_name, text, created_time) VALUES (?, ?, ?, ?, ?, ?)';
-		$stmt = $db->prepare($sql);
+		$selectSql = 'SELECT COUNT(id) AS existuje FROM Messages WHERE id=?';
+		$selectStmt = $db->prepare($selectSql);
+		$insertSql = 'INSERT OR IGNORE INTO Messages (id, thread_id, from_id, from_name, text, created_time, attachment_url)
+				VALUES (?, ?, ?, ?, ?, ?, ?)';
+		$insertStmt = $db->prepare($insertSql);
 		$db->beginTransaction();
 		foreach ($messages as $message)
 		{
-			$stmt->execute([
+			$selectStmt->execute([$message['id']]);
+			$result = $selectStmt->fetch();
+			if (((int) array_shift($result)) > 0) $exists = true;
+			//dump($exists);
+			//continue;
+
+			$attachment_url = null;
+			if (sizeof($message['attachments']) > 0)
+			{
+				//dump($message['attachments']);
+				$attachment = array_shift($message['attachments']);
+				$attachment_url = $attachment['url'];
+				//dump($attachment_url);
+			}
+
+			$insertStmt->execute([
 				$message['id'],
 				$threadId,
 				$message['from_id'],
 				$message['from'],
 				$message['message'],
-				$message['created_timestamp']
+				$message['created_timestamp'],
+				$attachment_url,
 			]);
 		}
 		$db->commit();
-		//dump($message);
 
+		return $exists;
 	}
 
+	/**
+	 * @param $threadId
+	 * @return string|null Message ID
+	 */
 	private function getLatestPersistedMessage($threadId)
 	{
 		/** @var Connection $db */
 		$db = $this->app['db'];
-		$sql = "SELECT MAX(id) AS max_id FROM Messages WHERE thread_id = $threadId";
+		$sql = "SELECT id AS max_id FROM Messages
+				  WHERE thread_id = '$threadId'
+				  AND created_time = (SELECT MAX(created_time) FROM Messages WHERE thread_id = '$threadId');";
 		$result = $db->fetchAssoc($sql);
 
-		return isset($result['max_id']) && $result['max_id'] > 0 ? $result['max_id'] : 0;
+		return isset($result['max_id']) && $result['max_id'] != '' ? $result['max_id'] : null;
+	}
+
+	/**
+	 * @param string $fullMessageId
+	 * @return string|null plain message id
+	 */
+	private function extractPlainMessageId($fullMessageId)
+	{
+		preg_match('/m_mid\.(\d*):\S*/', $fullMessageId, $matches);
+
+		if (isset($matches[1])) return $matches[1];
+		else return null;
 	}
 
 	private function getPersistedMessagesCount($threadId)
@@ -391,7 +434,7 @@ class FacebookApiClient {
 		/** @var Connection $db */
 		$db = $this->app['db'];
 		$sql = "SELECT COUNT(*) AS totalCount, SUM(LENGTH(text)) AS charsCount , SUM(LENGTH(text) - LENGTH(REPLACE(text, ' ', '')) + 1) AS wordsCount
-				FROM Messages WHERE thread_id = $threadId";
+				FROM Messages WHERE thread_id = '$threadId'";
 		$result = $db->fetchAssoc($sql);
 
 		return [
