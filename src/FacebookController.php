@@ -28,7 +28,7 @@ class FacebookController {
 			//'fbUserName'      => $fbUsername,
 			//'fbId'            => $fbId,
 			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
-			'inbox'        => $inbox
+			'inbox'           => $inbox
 		));
 
 	}
@@ -65,10 +65,10 @@ class FacebookController {
 		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook-message.twig', array(
-			'logoutUrl'       => $logoutUrl,
+			'logoutUrl' => $logoutUrl,
 			//'fbUserName'      => $fbUsername,
 			//'fbId'            => $fbId,
-			'message'          => $message
+			'message'   => $message
 		));
 	}
 
@@ -99,8 +99,29 @@ class FacebookController {
 		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook-notifications.twig', array(
-			'logoutUrl'  => $logoutUrl,
+			'logoutUrl'     => $logoutUrl,
 			'notifications' => $notifications,
+		));
+	}
+
+	public function showThreadImages(Request $request, Application $app, $threadId)
+	{
+		$fbClient = $app['facebook_api_client'];
+
+		//$paging = $this->parsePaging($request, 30);
+
+		//$me = $fbClient->getUserInfo();
+		//$fbUsername = $me->getName();
+		//$fbId = $me->getId();
+		$images = $fbClient->getThreadImages($threadId);
+		$logoutUrl = $fbClient->getLogoutUrl();
+
+		return $app['twig']->render('facebook-thread-images.twig', array(
+			'logoutUrl'       => $logoutUrl,
+			//'fbUserName'      => $fbUsername,
+			//'fbId'            => $fbId,
+			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
+			'images'          => $images
 		));
 	}
 

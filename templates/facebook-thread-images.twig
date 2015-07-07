@@ -1,0 +1,69 @@
+{% extends "bodylayout.twig" %}
+
+{% block title %}silex-hriste{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="small-12 columns">
+            {#<a href="#" id="showAllBtn" class="button sucess tiny">Show unread</a>#}
+            <a href="#" id="reloadBtn" class="button warning tiny">Reload</a>
+            {#<a href="/facebook/thread/{{ thread.id }}/count" id="countBtn" class="button summary tiny">Count</a>#}
+            {#<a href="/facebook/thread/{{ thread.id }}/images" id="countBtn" class="button summary tiny">Images</a>#}
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="small-12 columns">
+            <ul class="no-bullet">
+                <li>
+                    <span class="">{{ images|length }} images</span>
+                </li>
+                {#<li>#}
+                    {#<a href="/facebook/thread/{{ thread.id }}?until={{ thread.nextPage.until }}&since={{ thread.nextPage.since }}&__previous={{ thread.nextPage.__previous }}&limit={{ thread.nextPage.limit }}&__paging_token={{ thread.nextPage.__paging_token }}">#}
+                        {#previous#}
+                    {#</a>#}
+                {#</li>#}
+                <li>
+                    {#<span class="label info">{{ thread.users }}:</span>#}
+                    {#<span class="small-text"> unread: {{ thread.unread }}, displayed: {{ thread.displayed }}, total: {{ thread.count }}</span>#}
+                    <ul class="no-bullet">
+                        {% for image in images %}
+                            <li class="message-unread">
+                                <span class="label secondary">{{ image.from_name }}</span>
+                                {#<span class="small-text">{{ image.created_time }}</span>#}
+                                <span class="small-text">
+                                    <a href="{{ image.url }}"><img src="{{ image.preview_url }}"></a>
+                                </span>
+
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+{#                <li>
+                    <a href="/facebook/thread/{{ thread.id }}?until={{ thread.previousPage.until }}&since={{ thread.previousPage.since }}&__previous={{ thread.previousPage.__previous }}&limit={{ thread.previousPage.limit }}&__paging_token={{ thread.previousPage.__paging_token }}">
+                        next
+                    </a>
+                </li>#}
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 columns">
+            {#Logged in as: {{ fbUserName }}, id: {{ fbId }}#}
+        </div>
+    </div>
+    {#<div class="row">#}
+    {#<div class="small-12 columns">#}
+    {#<a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>#}
+    {#</div>#}
+    {#</div>#}
+
+    <script>
+        $(document).ready(function () {
+            $('#showAllBtn').trigger('click');
+        });
+    </script>
+
+{% endblock %}

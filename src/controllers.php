@@ -33,9 +33,11 @@ $facebookLogin = function (Request $request, Silex\Application $app)
 
 $app->get('/facebook/login', 'FacebookController::login');
 
-$app->get('/facebook/thread/count/{threadId}', 'FacebookController::countThread')->before($facebookLogin);
+$app->get('/facebook/thread/{threadId}/count', 'FacebookController::countThread')->before($facebookLogin);
 
 $app->get('/facebook/thread/{threadId}/message/{messageId}', 'FacebookController::showMessage')->before($facebookLogin);
+
+$app->get('/facebook/thread/{threadId}/images', 'FacebookController::showThreadImages')->before($facebookLogin);
 
 $app->get('/facebook/thread/{threadId}', 'FacebookController::showThread')->before($facebookLogin);
 

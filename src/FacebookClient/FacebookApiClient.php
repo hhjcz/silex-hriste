@@ -248,9 +248,10 @@ class FacebookApiClient {
 				$messages = $messagesGraph->extractMessages();
 				$alreadyPersisted = $this->persistMessages($threadId, $messages);
 				$newCount += sizeof($messages);
-				$this->app['monolog']->addDebug(sprintf("Pocet zprav so far: %d.", $newCount));
 				// dosli jsme az ke zpravam, ktery uz mame ulozeny, koncime:
 				if ($alreadyPersisted) break;
+
+				$this->app['monolog']->addDebug(sprintf("Pocet zprav so far: %d.", $newCount));
 
 				// predchozi (dalsi) stranka:
 				$request = $response->getRequestForNextPage();
@@ -305,6 +306,30 @@ class FacebookApiClient {
 	}
 
 	/**
+	 * @param string $threadId
+	 * @return array
+	 */
+	public function getThreadImages($threadId)
+	{
+		/** @var Connection $db */
+		$sql = 'SELECT id, from_name, created_time, attachment_preview_url, attachment_url FROM Messages WHERE thread_id = ? AND attachment_url IS NOT NULL ORDER BY created_time';
+		$db = $this->app['db'];
+		$stmt = $db->prepare($sql);
+		$stmt->execute([$threadId]);
+
+		$images = [];
+		foreach ($stmt->fetchAll() as $row) {
+			$image['preview_url'] = $row['attachment_preview_url'];
+			$image['url'] = $row['attachment_url'];
+			$image['from_name'] = $row['from_name'];
+			//$image['created_time'] = \Utils::prettifyTimestamp($row['from_name']);
+			array_push($images, $image);
+		}
+
+		return $images;
+	}
+
+	/**
 	 * @param FacebookResponse $response
 	 * @return array paging parameters
 	 */
@@ -356,8 +381,8 @@ class FacebookApiClient {
 		$db = $this->app['db'];
 		$selectSql = 'SELECT COUNT(id) AS existuje FROM Messages WHERE id=?';
 		$selectStmt = $db->prepare($selectSql);
-		$insertSql = 'INSERT OR IGNORE INTO Messages (id, thread_id, from_id, from_name, text, created_time, attachment_url)
-				VALUES (?, ?, ?, ?, ?, ?, ?)';
+		$insertSql = 'INSERT OR IGNORE INTO Messages (id, thread_id, from_id, from_name, text, created_time, attachment_url, attachment_preview_url)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 		$insertStmt = $db->prepare($insertSql);
 		$db->beginTransaction();
 		foreach ($messages as $message)
@@ -367,10 +392,12 @@ class FacebookApiClient {
 			if (((int) array_shift($result)) > 0) $exists = true;
 
 			$attachment_url = null;
+			$attachment_preview_url = null;
 			if (sizeof($message['attachments']) > 0)
 			{
 				$attachment = array_shift($message['attachments']);
 				$attachment_url = $attachment['url'];
+				$attachment_preview_url = $attachment['preview_url'];
 			}
 
 			$insertStmt->execute([
@@ -381,6 +408,7 @@ class FacebookApiClient {
 				$message['message'],
 				$message['created_timestamp'],
 				$attachment_url,
+				$attachment_preview_url,
 			]);
 		}
 		$db->commit();
