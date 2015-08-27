@@ -6,8 +6,13 @@
 
     <div class="row">
         <div class="small-12 columns">
-            {#<a href="#" id="showAllBtn" class="button sucess tiny">Show all</a>#}
+            {% if unreadOnly == true %}
+                <a href="/facebook?unreadOnly=false" id="showAllBtn-no-js" class="button success tiny">All</a>
+            {% else %}
+                <a href="/facebook?unreadOnly=true" id="showUnreadBtn-no-js" class="button success tiny">Unread</a>
+            {% endif %}
             <a href="#" id="reloadBtn" class="button warning tiny">Reload</a>
+            <a class="button tiny" href="{{ logoutUrl }}">Logout</a>
         </div>
     </div>
     <div class="row">
@@ -20,7 +25,7 @@
                 <ul class="no-bullet">
                     {% if inbox.threads|length > 0 %}
                         <li>
-                            <a href="/facebook?until={{ inbox.previousPage.until }}&since={{ inbox.previousPage.since }}&__previous={{ inbox.previousPage.__previous }}&limit={{ inbox.previousPage.limit }}&__paging_token={{ inbox.previousPage.__paging_token }}">
+                            <a href="/facebook?unreadOnly={{ unreadOnly ? 'true' : 'false' }}&until={{ inbox.previousPage.until }}&since={{ inbox.previousPage.since }}&__previous={{ inbox.previousPage.__previous }}&limit={{ inbox.previousPage.limit }}&__paging_token={{ inbox.previousPage.__paging_token }}">
                                 previous
                             </a>
                         </li>
@@ -45,13 +50,13 @@
                             <hr>
                         {% endfor %}
                         <li>
-                            <a href="/facebook?until={{ inbox.nextPage.until }}&since={{ inbox.nextPage.since }}&__previous={{ inbox.nextPage.__previous }}&limit={{ inbox.nextPage.limit }}&__paging_token={{ inbox.nextPage.__paging_token }}">
+                            <a href="/facebook?unreadOnly={{ unreadOnly ? 'true' : 'false' }}&until={{ inbox.nextPage.until }}&since={{ inbox.nextPage.since }}&__previous={{ inbox.nextPage.__previous }}&limit={{ inbox.nextPage.limit }}&__paging_token={{ inbox.nextPage.__paging_token }}">
                                 next
                             </a>
                         </li>
                     {% else %}
                         <img src="/img/smiling_sun.jpg">
-                    {%  endif %}
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -61,11 +66,11 @@
                 {#Logged in as: {{ fbUserName }}, id: {{ fbId }}#}
             </div>
         </div>
-        <div class="row">
-            <div class="small-12 columns">
-                <a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>
-            </div>
-        </div>
+        {#<div class="row">#}
+            {#<div class="small-12 columns">#}
+                {#<a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>#}
+            {#</div>#}
+        {#</div>#}
 
     </div>
 {% endblock %}

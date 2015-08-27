@@ -158,7 +158,7 @@ class FacebookApiClient {
 			$response = $request->execute();
 			$inboxGraph = new InboxGraph($response->getGraphObject());
 
-			$inbox = $inboxGraph->extractThreads($inboxGraph, $unreadOnly);
+			$inbox = $inboxGraph->extractThreads($unreadOnly);
 
 			$paging = $this->extractPagingFromResponse($response);
 			$inbox->previousPage = $paging['previous'];

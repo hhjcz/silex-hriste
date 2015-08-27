@@ -14,21 +14,22 @@ class FacebookController {
 	{
 		$fbClient = $app['facebook_api_client'];
 
+		$unreadOnly = $request->query->get('unreadOnly') == 'false' ? false : true;
 		$paging = $this->parsePaging($request, 5);
 
 		//$me = $fbClient->getUserInfo();
 		//$fbUsername = $me->getName();
 		//$fbId = $me->getId();
-		$inbox = $fbClient->getInbox($paging);
+		$inbox = $fbClient->getInbox($paging, $unreadOnly);
 		$logoutUrl = $fbClient->getLogoutUrl();
 
 		return $app['twig']->render('facebook-inbox.twig', array(
 			//'userLoggedIn'    => true,
-			'logoutUrl'       => $logoutUrl,
+			'logoutUrl'  => $logoutUrl,
 			//'fbUserName'      => $fbUsername,
 			//'fbId'            => $fbId,
-			'showAllMessages' => (bool) $request->query->get('showAllMessages') == 'true' ? true : false,
-			'inbox'           => $inbox
+			'unreadOnly' => $unreadOnly,
+			'inbox'      => $inbox
 		));
 
 	}
