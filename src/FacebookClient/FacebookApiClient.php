@@ -144,11 +144,12 @@ class FacebookApiClient {
 
 	/**
 	 * @param array $paging
+	 * @param bool $unreadOnly
 	 * @return GraphObject
 	 * @throws Exception
 	 * @throws FacebookRequestException
 	 */
-	public function getInbox($paging)
+	public function getInbox($paging, $unreadOnly = true)
 	{
 		$paging['limit'] = $paging['limit'] ?: 5;
 		try
@@ -157,7 +158,7 @@ class FacebookApiClient {
 			$response = $request->execute();
 			$inboxGraph = new InboxGraph($response->getGraphObject());
 
-			$inbox = $inboxGraph->extractThreads($inboxGraph);
+			$inbox = $inboxGraph->extractThreads($inboxGraph, $unreadOnly);
 
 			$paging = $this->extractPagingFromResponse($response);
 			$inbox->previousPage = $paging['previous'];
