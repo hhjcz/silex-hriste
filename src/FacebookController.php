@@ -154,6 +154,10 @@ class FacebookController {
 			//FacebookPermissions::PUBLISH_ACTIONS,
 		]);
 
+		// redirect to fb login page, which then redirects back:
+		return $app->redirect($loginUrl);
+
+		// use login button instead:
 		return $app['twig']->render('facebook-login.twig', array(
 			'loginUrl' => $loginUrl,
 		));
