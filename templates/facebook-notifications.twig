@@ -8,6 +8,7 @@
         <div class="small-12 columns">
             {#<a href="#" id="showAllBtn" class="button sucess tiny">Show all</a>#}
             <a href="#" id="reloadBtn" class="button warning tiny">Reload</a>
+            <a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>
         </div>
     </div>
     <div class="row">
@@ -55,11 +56,11 @@
                 {#Logged in as: {{ fbUserName }}, id: {{ fbId }}#}
             </div>
         </div>
-        <div class="row">
-            <div class="small-12 columns">
-                <a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>
-            </div>
-        </div>
+        {#<div class="row">#}
+            {#<div class="small-12 columns">#}
+                {#<a class="button tiny" href="{{ logoutUrl }}">Facebook logout</a>#}
+            {#</div>#}
+        {#</div>#}
 
     </div>
 {% endblock %}
