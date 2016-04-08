@@ -20,9 +20,10 @@ class FacebookApiClientTest extends \PHPUnit_Framework_TestCase {
 	public function setUp()
 	{
 		parent::setUp();
+		$app = require __DIR__ . '/../app.php';
 		// $this->object = m::mock(self::OBJECT_CLASS);
 		$className = self::OBJECT_CLASS;
-		$this->object = new $className();
+		$this->object = new $className($app);
 		//$this->object = App::make(self::OBJECT_CLASS);
 	}
 
@@ -31,15 +32,6 @@ class FacebookApiClientTest extends \PHPUnit_Framework_TestCase {
 	public function test_instance()
 	{
 		$this->assertInstanceOf(self::OBJECT_CLASS, $this->object);
-	}
-
-	/**
-	 * @test
-	 */
-	public function should_prettify_timestamp()
-	{
-		$prettyTime = $this->object->prettifyTimestamp('2015-04-20T14:43:51+0000')->formatLocalized('%a %d %b %H:%M');
-		$this->assertInternalType('string', $prettyTime);
 	}
 
 	//endregion
