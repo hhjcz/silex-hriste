@@ -63,6 +63,10 @@ $app->get('/oris/calendar.ics', function (Request $request) use ($app)
 	return $response;
 });
 
+$app->get('/oris/calendar-new.ics', function () use ($app) {
+	return $app->redirect('/oris/calendar.ics');
+});
+
 //$app->get('{url}', function () use ($app)
 //{
 //	return $app->redirect('/angular');
