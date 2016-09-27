@@ -38,7 +38,7 @@ class FacebookController {
 	{
 		$fbClient = $app['facebook_api_client'];
 
-		$paging = $this->parsePaging($request, 30);
+		$paging = $this->parsePaging($request, $app['message_page_size'] ?: 30);
 
 		//$me = $fbClient->getUserInfo();
 		//$fbUsername = $me->getName();
